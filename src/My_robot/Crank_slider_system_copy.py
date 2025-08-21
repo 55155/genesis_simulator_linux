@@ -11,7 +11,7 @@ scene = gs.Scene(
     show_viewer=True,
     sim_options= gs.options.SimOptions(
         dt = 0.01,
-        gravity=(0.0, 0.0, 0),
+        gravity=(0.0, 0.0, -9.81),
     ),
     viewer_options=gs.options.ViewerOptions(
         res=(1280, 960),
@@ -32,9 +32,9 @@ scene = gs.Scene(
     renderer=gs.renderers.Rasterizer(),
 )
 
-# plane = scene.add_entity(gs.morphs.Plane(
-#     pos = (0, 0, 0),
-# ))
+plane = scene.add_entity(gs.morphs.Plane(
+    pos = (0, 0, 0),
+))
 
 # Adding a drone entity to the scene
 # franka = scene.add_entity(
@@ -47,27 +47,46 @@ my_link = scene.add_entity(
     gs.morphs.URDF(file = fn, euler = (90,0,0),pos = (-0.3, 0.0, 0), scale = 1.0, decimate = False, convexify = False,),
 )
 
+
+## scene에 모든 엔티티 추가 후에 build
 cam = scene.add_camera(
     res=(1280, 960),
-    pos=(3.5, 0.0, 2.5),
-    lookat=(0, 0, 0.5),
+    pos=(2.0 * np.sin(1 / 60), 2.0 * np.cos(np.pi), 1),
+    lookat=(0, 0, 0.0),
     fov=30,
     
     GUI=True,
 )
 
+n_envs = 20
 scene.build()
+
+jnt_names = [
+    'Revolute 47',
+    'Revolute 49',
+    'Revolute 50',
+]
+dofs_idx = [my_link.get_joint(name).dof_idx_local for name in jnt_names]
+
+print(dofs_idx)
+
+# for parallelization
+# pos_command = np.array([1,0,0])[None, :].repeat(n_envs, axis=0)
 
 cam.start_recording()
 normal = cam.render()
+iter = 400
 
-for i in range(300):
+my_link.control_dofs_position([np.pi,0,0], dofs_idx)
+
+for i in range(400):
     scene.step()
-    cam.render()
-    cam.set_pose(
-        pos=(1.0 * np.sin(i / 60), -1.0 * np.cos(i / 60), 0.5),
-        lookat=(0, 0, 0.0),
-    )
+    # cam.set_pose(
+    #     pos=(5.0 * np.sin(i / 60), -5.0 * np.cos(i / 60), 2 * i / iter),
+    #     lookat=(0, 0, 0.0),
+    # )
     cam.render()
 
-cam.stop_recording(save_to_filename = config['file_path']['video']+'/'+fn.split('/')[-1]+"_black_high_res_no_devimate.mp4")
+my_link.control_dofs_position([2*np.pi,0,0], dofs_idx)
+
+cam.stop_recording(save_to_filename = config['file_path']['video']+'/'+fn.split('/')[-1]+"_GF_rotatePI_black_high_res_no_devimate.mp4")
