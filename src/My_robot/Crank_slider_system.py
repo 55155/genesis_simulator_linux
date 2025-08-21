@@ -1,5 +1,6 @@
 import genesis as gs
 import yaml
+import numpy as np
 
 with open('/home/seongjin/Desktop/Seongjin/genesis_simulation_on_linux/src/config.yaml', 'r') as file:
     config = yaml.load(file, Loader=yaml.Loader)
@@ -10,7 +11,7 @@ scene = gs.Scene(
     show_viewer=True,
     sim_options= gs.options.SimOptions(
         dt = 0.01,
-        gravity=(0.0, 0.0, -9.81),
+        gravity=(0.0, 0.0, 0),
     ),
     viewer_options=gs.options.ViewerOptions(
         res=(1280, 960),
@@ -31,23 +32,23 @@ scene = gs.Scene(
     renderer=gs.renderers.Rasterizer(),
 )
 
-plane = scene.add_entity(gs.morphs.Plane(
-    pos = (0, 0, -1),
-))
+# plane = scene.add_entity(gs.morphs.Plane(
+#     pos = (0, 0, 0),
+# ))
 
 # Adding a drone entity to the scene
 # franka = scene.add_entity(
 #     gs.morphs.URDF(file = 'urdf/drones/racer.urdf'),
 # )
-file_name = '/home/seongjin/Desktop/Seongjin/genesis_simulation_on_linux/My_asset/Crank_slider_system_description/urdf/Crank_slider_system.urdf'
+fn = '/home/seongjin/Desktop/Seongjin/genesis_simulation_on_linux/My_asset/Crank_slider_system_description/urdf/Crank_slider_system.urdf'
 
 # Adding a My_link entity to the scene
 my_link = scene.add_entity(
-    gs.morphs.URDF(file = file_name,),
+    gs.morphs.URDF(file = fn, euler = (90,0,0),),
 )
 
 cam = scene.add_camera(
-    res=(640, 480),
+    res=(1280, 960),
     pos=(3.5, 0.0, 2.5),
     lookat=(0, 0, 0.5),
     fov=30,
@@ -60,10 +61,13 @@ scene.build()
 cam.start_recording()
 normal = cam.render()
 
-
-
-for i in range(1000):
+for i in range(300):
     scene.step()
     cam.render()
+    cam.set_pose(
+        pos=(-1.0 * np.sin(i / 120), 1.0 * np.cos(i / 120), 2),
+        lookat=(0, 0, 0.0),
+    )
+    cam.render()
 
-cam.stop_recording(file_name = config['file_path']['video']+'/'+file_name.split('/')[-1]+"_no_devimate.mp4")#save_to_filename=f"/home/seongjin/Desktop/Seongjin/genesis_simulation_on_linux/video/{file_name.split('/')[-1]}.mp4", fps=60)
+cam.stop_recording(save_to_filename = config['file_path']['video']+'/'+fn.split('/')[-1]+"_high_res_no_devimate.mp4")

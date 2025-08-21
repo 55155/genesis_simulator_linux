@@ -12,7 +12,6 @@ node [shape=box];
 "Impact_Plate" [label="Impact_Plate"];
 "Slider1" [label="Slider1"];
 "Slider_jig" [label="Slider_jig"];
-"Slider_jig" [label="Slider_jig"];
 "Wall" [label="Wall"];
 node [shape=ellipse, color=blue, fontcolor=blue];
 "base_link" -> "Rigid 44" [label="xyz: 0.11 0.01 -0.185 \nrpy: 0 -0 0"]
@@ -21,8 +20,8 @@ node [shape=ellipse, color=blue, fontcolor=blue];
 "Rigid 45" -> "braket2"
 "braket2" -> "Rigid 46" [label="xyz: 0 0.03 -0.0055 \nrpy: 0 -0 0"]
 "Rigid 46" -> "motor"
-"motor" -> "Rigid 47" [label="xyz: 0 0 0.0025 \nrpy: 0 -0 0"]
-"Rigid 47" -> "motor_shaft"
+"motor" -> "Revolute 47" [label="xyz: 0 0 0.0025 \nrpy: 0 -0 0"]
+"Revolute 47" -> "motor_shaft"
 "motor_shaft" -> "Rigid 48" [label="xyz: 0 0 0.0195 \nrpy: 0 -0 0"]
 "Rigid 48" -> "Link1"
 "Link1" -> "Revolute 49" [label="xyz: 0.02 0 0 \nrpy: 0 -0 0"]
@@ -36,8 +35,6 @@ node [shape=ellipse, color=blue, fontcolor=blue];
 "Shaft" -> "Slider 60" [label="xyz: 0.0105 0 0 \nrpy: 0 -0 0"]
 "Slider 60" -> "Slider1"
 "Slider1" -> "Rigid 59" [label="xyz: 0.0075 -0.007 0.013 \nrpy: 0 -0 0"]
-"Rigid 59" -> "Slider_jig"
-"base_link" -> "Rigid 59" [label="xyz: 0.0075 -0.007 0.013 \nrpy: 0 -0 0"]
 "Rigid 59" -> "Slider_jig"
 "base_link" -> "Rigid 55" [label="xyz: 0.394243 0.01 -0.16 \nrpy: 0 -0 0"]
 "Rigid 55" -> "Wall"
