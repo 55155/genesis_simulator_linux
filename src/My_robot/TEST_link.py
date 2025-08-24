@@ -1,8 +1,7 @@
+'''
 import genesis as gs
 
 gs.init(backend=gs.cuda)
-config = {"file_name": "/home/seongjin/Desktop/Seongjin/genesis_simulation_on_linux/" \
-    "My_asset/Crank_slider_system_description/urdf/Crank_slider_system.urdf"}
 
 Scene = gs.Scene(show_viewer=True,
                  sim_options= gs.options.SimOptions(
@@ -35,3 +34,22 @@ for i in range(1000):
     cam.render()
 
 cam.stop_recording() # save_to_filename=f"/home/seongjin/Desktop/Seongjin/genesis_simulation_on_linux/video/{config['file_name'].split('/')[-1]}_NO_decimation.mp4", fps=60)
+'''
+import genesis as gs
+
+gs.init(backend=gs.cpu, logging_level="debug")
+
+scene = gs.Scene(
+    show_viewer=True,
+)
+plane = scene.add_entity(
+    gs.morphs.Plane(),
+)
+scene.add_entity(
+    gs.morphs.Mesh(
+        file='/home/seongjin/Desktop/Seongjin/genesis_simulation_on_linux/My_asset/TEST_LINK_sizeup_description/meshes/base_link.stl',
+        scale=(0.001, 0.001, 0.001),
+    ),
+)
+scene.build()
+# scene.viewer.run()

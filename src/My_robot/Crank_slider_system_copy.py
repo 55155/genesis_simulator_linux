@@ -58,8 +58,8 @@ cam = scene.add_camera(
     GUI=True,
 )
 
-n_envs = 20
-scene.build()
+n_envs = 300
+scene.build(n_envs=n_envs, env_spacing=(0.5, 0.5),)
 
 jnt_names = [
     'Revolute 47',
@@ -71,22 +71,21 @@ dofs_idx = [my_link.get_joint(name).dof_idx_local for name in jnt_names]
 print(dofs_idx)
 
 # for parallelization
-# pos_command = np.array([1,0,0])[None, :].repeat(n_envs, axis=0)
+pos_command = np.array([1,0,0])[None, :].repeat(n_envs, axis=0)
 
 cam.start_recording()
 normal = cam.render()
 iter = 400
 
-my_link.control_dofs_position([np.pi,0,0], dofs_idx)
+my_link.control_dofs_position(pos_command, dofs_idx)
 
-for i in range(400):
+for i in range(iter):
     scene.step()
-    # cam.set_pose(
-    #     pos=(5.0 * np.sin(i / 60), -5.0 * np.cos(i / 60), 2 * i / iter),
-    #     lookat=(0, 0, 0.0),
-    # )
+    cam.set_pose(
+        pos=(2.0 * np.sin(1 / 60), 2.0 * np.cos(np.pi), i/20),
+        lookat=(i/20, i/20, 0.0),
+    )
     cam.render()
 
-my_link.control_dofs_position([2*np.pi,0,0], dofs_idx)
 
-cam.stop_recording(save_to_filename = config['file_path']['video']+'/'+fn.split('/')[-1]+"_GF_rotatePI_black_high_res_no_devimate.mp4")
+cam.stop_recording(save_to_filename = config['file_path']['video']+'/'+fn.split('/')[-1]+"_GF_env_300_rotatePI_black_high_res_no_devimate.mp4")
