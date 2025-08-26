@@ -66,7 +66,7 @@ q_pregrasp = franka.inverse_kinematics(
     quat = np.array([0, 1, 0, 0]),        # down-facing orientation
 )
 print(q_pregrasp)
-'''
+
 franka.control_dofs_position(q_pregrasp[:-2], np.arange(7))  # arm joints only
 for _ in range(50):
     cam.render()
@@ -109,5 +109,3 @@ for _ in range(400):
 
 print(config['video']['output_directory'])
 cam.stop_recording(save_to_filename=f"{config['video']['output_directory']}/pick_and_place.mp4")  # save_to_filename="suctioncup_pick_and_place.mp4", fps=60)
-
-'''

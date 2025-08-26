@@ -1,0 +1,1 @@
+'Genesis/genesis/assets/urdf/drones/racer.urdf'

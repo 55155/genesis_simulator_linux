@@ -63,8 +63,6 @@ scene.build()
 cam.start_recording()
 normal = cam.render()
 
-
-
 for i in range(300):
     scene.step()
     cam.set_pose(

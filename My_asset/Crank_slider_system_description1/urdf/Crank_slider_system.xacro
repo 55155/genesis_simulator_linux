@@ -1,9 +1,9 @@
 <?xml version="1.0" ?>
 <robot name="Crank_slider_system" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
-<xacro:include filename="$(find Crank_slider_system_description)/urdf/materials.xacro" />
-<xacro:include filename="$(find Crank_slider_system_description)/urdf/Crank_slider_system.trans" />
-<xacro:include filename="$(find Crank_slider_system_description)/urdf/Crank_slider_system.gazebo" />
+<xacro:include filename="../urdf/materials.xacro" />
+<xacro:include filename="../urdf/Crank_slider_system.trans" />
+<xacro:include filename="../urdf/Crank_slider_system.gazebo" />
 <link name="base_link">
   <inertial>
     <origin xyz="0.22492636641555602 0.005 -0.16001305238884705" rpy="0 0 0"/>

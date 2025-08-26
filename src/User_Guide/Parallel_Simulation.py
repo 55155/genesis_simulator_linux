@@ -23,6 +23,7 @@ scene.build(n_envs=3000)
 # control all the robots
 franka.control_dofs_position(
     torch.tile(
+        # N
         torch.tensor([0, 0, 0, -1.0, 0, 0, 0, 0.02, 0.02], device=gs.device), (3000, 1)
     ),
 )

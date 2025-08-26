@@ -72,4 +72,4 @@ for i in range(1000):
     )
     cam.render()
 
-# cam.stop_recording(save_to_filename = config['file_path']['video']+'/'+fn.split('/')[-1]+"_super_high_res_no_devimate_black.mp4", fps = 60)
+# cam.stop_recording(save_to_filename = config['file_path']['video']+'/'+fn.split('/')[-1]+"_super_high_res_no_decimate_black.mp4", fps = 60)

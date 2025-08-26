@@ -417,7 +417,7 @@
       </geometry>
     </collision>
   </link>
-
+  
 
   <joint name="Rigid44" type="fixed">
     <origin rpy="0 0 0" xyz="0.11 0.01 -0.185"/>
