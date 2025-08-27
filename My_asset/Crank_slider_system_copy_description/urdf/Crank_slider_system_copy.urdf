@@ -457,30 +457,44 @@
     <child link="Link3_1"/>
     <axis xyz="0.0 -0.0 -1.0"/>
   </joint>
+  
   <joint name="Rigid 51" type="fixed">
     <origin rpy="0 0 0" xyz="0.027 0.0 -0.005"/>
     <parent link="Link3_1"/>
     <child link="Shaft_1"/>
   </joint>
+  
   <joint name="Rigid 53" type="fixed">
     <origin rpy="0 0 0" xyz="0.1 0.0 0.0"/>
     <parent link="Shaft_1"/>
     <child link="Impact_Plate_1"/>
   </joint>
+  
   <joint name="Rigid 54" type="fixed">
     <origin rpy="0 0 0" xyz="0.283 0.01 -0.1475"/>
     <parent link="base_link"/>
     <child link="Slider_jig_1"/>
   </joint>
+  
   <joint name="Rigid 55" type="fixed">
     <origin rpy="0 0 0" xyz="0.394243 0.01 -0.16"/>
     <parent link="base_link"/>
     <child link="Wall_1"/>
   </joint>
+  
   <joint name="Rigid 61" type="fixed">
     <origin rpy="0 0 0" xyz="-0.014 0.033 0.012"/>
     <parent link="Slider_jig_1"/>
     <child link="Slider1_1"/>
+  </joint>
+
+  <joint name="Slider 60" type="prismatic">
+    <origin rpy="0 0 0" xyz="0.0105 0.0 0.0"/>
+    <parent link="Shaft_1"/>
+    <child link="Slider1_1"/>
+    <axis xyz="-1.0 -0.0 -0.0"/>
+    <limit effort="100" lower="0.0" upper="0.0" velocity="100"/>
+    <mimic joint="Revolute 47" multiplier="-0.5" offset="0.0"/>
   </joint>
 
 </robot>
