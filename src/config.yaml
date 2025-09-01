@@ -10,11 +10,11 @@ simulation:
 
 
 My_robot:
-  urdf_path: "home/seongjin/Desktop/Seongjin/genesis_simulation_on_linux/src/My_robot"
+  urdf_path: "./genesis_simulation_on_linux/src/My_robot"
 
 
 
 file_path:
-  video: "home/seongjin/Desktop/Seongjin/genesis_simulation_on_linux/video"
-  asset: "/home/seongjin/Desktop/Seongjin/genesis_simulation_on_linux/My_asset"
+  video: "./genesis_simulation_on_linux/video"
+  asset: "./genesis_simulation_on_linux/My_asset"
 
