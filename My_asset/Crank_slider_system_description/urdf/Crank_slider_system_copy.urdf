@@ -306,7 +306,8 @@
   <link name="Slider_jig">
     <inertial>
       <origin rpy="0 0 0" xyz="5.96050764301026e-10 0.014032687941284544 -8.326672684688674e-17"/>
-      <mass value="0.29233817695735465"/>
+      <!--<mass value="0.29233817695735465"/>-->
+      <mass value="2000"/>
       <inertia ixx="5e-05" ixy="-0.0" ixz="-0.0" iyy="7.3e-05" iyz="0.0" izz="6.7e-05"/>
     </inertial>
     <visual>

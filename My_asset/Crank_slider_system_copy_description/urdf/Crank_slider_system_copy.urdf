@@ -356,7 +356,8 @@
   <link name="Slider_jig_1">
     <inertial>
       <origin rpy="0 0 0" xyz="5.96050764301026e-10 0.01403268794128455 -8.326672684688674e-17"/>
-      <mass value="0.29233817695735465"/>
+      <!--<mass value="0.29233817695735465"/>-->
+      <mass value="2000000"/>
       <inertia ixx="5e-05" ixy="-0.0" ixz="-0.0" iyy="7.3e-05" iyz="0.0" izz="6.7e-05"/>
     </inertial>
     <visual>
@@ -482,11 +483,11 @@
     <child link="Wall_1"/>
   </joint>
   
-  <joint name="Rigid 61" type="fixed">
+  <!--<joint name="Rigid 61" type="fixed">
     <origin rpy="0 0 0" xyz="-0.014 0.033 0.012"/>
-    <parent link="Slider_jig_1"/>
-    <child link="Slider1_1"/>
-  </joint>
+    <parent link="Slider1_1"/>
+    <child link="Slider_jig_1"/>
+  </joint>-->
 
   <joint name="Slider 60" type="prismatic">
     <origin rpy="0 0 0" xyz="0.0105 0.0 0.0"/>
