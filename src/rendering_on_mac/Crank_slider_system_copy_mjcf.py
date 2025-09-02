@@ -38,7 +38,7 @@ plane = scene.add_entity(gs.morphs.Plane(
 
 # adding Crank_slider_system_copy mjcf entity to the scene
 
-fn = './My_asset/Crank_slider_system_copy_description/urdf/Crank_slider_system_copy_modified_inertia.xml'
+fn = './My_asset/Crank_slider_system_copy_description/urdf/Crank_slider_system_copy_modified_inertia_v2.xml'
 my_link = scene.add_entity(
     gs.morphs.MJCF(file = fn, euler = (90,0,0), pos = (-0.3, 0.0, 0), scale = 1.0, decimate = False, convexify = False,),
 )
