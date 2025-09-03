@@ -2,7 +2,7 @@ import genesis as gs
 import numpy as np
 import yaml 
 
-with open('./src/config.yaml', 'r') as file:
+with open('/home/seongjin/Desktop/Seongjin/genesis_simulation_on_linux/src/config.yaml', 'r') as file:
     config = yaml.load(file, Loader=yaml.Loader)
 
 gs.init(backend=gs.cuda)

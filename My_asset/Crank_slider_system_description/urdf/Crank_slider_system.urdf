@@ -483,12 +483,12 @@
     <child link="Slider1"/>
   </joint>
 
-  <!--<joint name="Slider 60" type="prismatic">
+  <joint name="Slider 60" type="prismatic">
     <origin rpy="0 0 0" xyz="0.0105 0.0 0.0"/>
     <parent link="Shaft"/>
     <child link="Slider1"/>
     <axis xyz="-1.0 -0.0 -0.0"/>
-    <limit effort="100" lower="0.0" upper="0.0" velocity="100"/>
-  </joint>-->
+    <mimic joint='Revolute 49'/>
+  </joint>
 
 </robot>

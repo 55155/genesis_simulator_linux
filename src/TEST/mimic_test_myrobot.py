@@ -40,7 +40,7 @@ plane = scene.add_entity(gs.morphs.Plane(
 # franka = scene.add_entity(
 #     gs.morphs.URDF(file = 'urdf/drones/racer.urdf'),
 # )
-fn = '/home/seongjin/Desktop/Seongjin/genesis_simulation_on_linux/My_asset/Crank_slider_system_copy_description/urdf/Crank_slider_system_copy.urdf'
+fn = f'{config['file_path']['asset']}/urdf/Crank_slider_system_copy.urdf'
 
 # Adding a My_link entity to the scene
 my_link = scene.add_entity(

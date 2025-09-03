@@ -65,7 +65,8 @@ jnt_names = [
     'Revolute 47',
     'Revolute 49',
     'Revolute 50',
-    
+    ''
+
 ]
 dofs_idx = [my_link.get_joint(name).dof_idx_local for name in jnt_names]
 
