@@ -1,1 +1,1 @@
-# genesis_simulator_linux
+# genesis_simulator
