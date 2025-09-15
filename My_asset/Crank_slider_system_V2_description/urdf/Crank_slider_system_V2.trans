@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<robot name="Crank_slider_system_V1" xmlns:xacro="http://www.ros.org/wiki/xacro" >
+<robot name="Crank_slider_system_V2" xmlns:xacro="http://www.ros.org/wiki/xacro" >
 
 <transmission name="Revolute 47_tran">
   <type>transmission_interface/SimpleTransmission</type>

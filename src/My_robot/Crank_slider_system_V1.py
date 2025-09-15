@@ -11,7 +11,7 @@ scene = gs.Scene(
     show_viewer=True,
     sim_options= gs.options.SimOptions(
         dt = 0.1,
-        gravity=(0.0, 0.0,0.0),
+        gravity=(0.0, 0.0, -9.81),
     ),
     viewer_options=gs.options.ViewerOptions(
         res=(1280, 960),
@@ -44,7 +44,7 @@ fn = '/home/seongjin/Desktop/Seongjin/genesis_simulation_on_linux/My_asset/Crank
 
 # Adding a My_link entity to the scene
 my_link = scene.add_entity(
-    gs.morphs.MJCF(file = fn, euler = (90,0,0),pos = (-0.3, 0.0, 0), scale = 1.0, decimate = False, convexify = False,),
+    gs.morphs.MJCF(file = fn, euler = (90,0,90),pos = (-0.3, 0.0, 0), scale = 1.0, decimate = False, convexify = False,),
 )
 
 
@@ -71,11 +71,11 @@ dofs_idx = [my_link.get_joint(name).dof_idx_local for name in jnt_names]
 print(dofs_idx)
 
 # for parallelization
-pos_command = np.array([10,0,0])[None, :].repeat(n_envs, axis=0)
+pos_command = np.array([3,0,0])[None, :].repeat(n_envs, axis=0)
 
-# cam.start_recording()
-# normal = cam.render()
-iter = 10000
+cam.start_recording()
+normal = cam.render()
+iter = 1000
 
 my_link.set_dofs_force_range(
     lower = (-0.0625, 0, 0),
@@ -87,11 +87,11 @@ print(my_link.get_dofs_force())
 
 for i in range(iter):
     scene.step()
-    # cam.set_pose(
-    #     pos=(2.0 * np.sin(1 / 60), 2.0 * np.cos(np.pi), i/20),
-    #     lookat=(i/20, i/20, 0.0),
-    # )
-    # cam.render()
+    cam.set_pose(
+        pos=(2.0,0.5, 0.5),
+        lookat=(0,0.5,0.0),
+    )
+    cam.render()
 
 
-# cam.stop_recording(save_to_filename = config['file_path']['video']+'/'+fn.split('/')[-1]+"_GF_env_300_rotatePI_black_high_res_no_devimate.mp4")
+cam.stop_recording(save_to_filename = config['file_path']['video']+'/'+fn.split('/')[-1]+"20250912.mp4")

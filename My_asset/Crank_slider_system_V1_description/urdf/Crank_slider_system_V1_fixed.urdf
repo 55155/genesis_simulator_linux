@@ -388,8 +388,8 @@
     <parent link="base_link" />
     <child link="Wall_1" />
   </joint>
-  
-  <!--<joint name="Slider 61" type="prismatic">
+
+  ㄴ<!--<joint name="Slider 61" type="prismatic">
     <origin rpy="0 0 0" xyz="0.2615 0.05 -0.1485" />
     <parent link="base_link" />
     <child link="Shaft_1" />
