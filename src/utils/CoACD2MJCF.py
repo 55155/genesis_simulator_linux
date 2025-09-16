@@ -16,7 +16,14 @@ for obj_file in sorted(obj_files):
     Temp = os.path.splitext(obj_file)[0]
     output_lines.append(f'<mesh name="{Temp}" file="{abs_path}" scale="{scale_str}"/>')
 
+for obj_file in sorted(obj_files):
+    abs_path = os.path.join(folder_path, obj_file)
+    Temp = os.path.splitext(obj_file)[0]
+    # <geom rgba="0.7 0.7 0.7 1" type="mesh" mesh="Slider1_1_collision_(182)"/>
+    output_lines.append(f'<geom rgba="0.7 0.7 0.7 1" type="mesh" mesh="{Temp}"/>')
+
 # txt 파일로 저장
 output_path = os.path.join(folder_path, 'mesh_list.txt')
 with open(output_path, 'w') as f:
     f.write('\n'.join(output_lines))
+
