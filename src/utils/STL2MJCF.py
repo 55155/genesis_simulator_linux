@@ -21,8 +21,8 @@ def stl_to_obj(stl_path, obj_path):
     mesh.export(obj_path, file_type='obj')
     print(f"Converted '{stl_path}' to '{obj_path}'")
 
-stl_path = asset_path + 'Crank_slider_system_V3_description/urdf/'
-obj_path = asset_path + 'Crank_slider_system_V3_description/urdf/'
+stl_path = asset_path + 'Tablet'
+obj_path = asset_path + 'Tablet'
 
 stl_files = get_all_stl_files(stl_path)
 for stl_file in stl_files:
@@ -45,4 +45,3 @@ for stl_file in stl_files:
         output_obj_path = f"{obj_file}_collision_({i+1}).obj"
         part_mesh.export(output_obj_path)
         print(f"Saved convex hull part {i+1} to {output_obj_path}")
-
