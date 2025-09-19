@@ -45,7 +45,7 @@ if __name__ == "__main__":
         config = yaml.safe_load(file)
 
     asset_path = config["file_path"]["asset"]
-    Robot_name = "Crank_slider_system_V3"
+    Robot_name = "Crank_slider_system_V3_Pjoint"
     file_path = asset_path + Robot_name + "_description" + "/urdf/"
     xacro_file = file_path + Robot_name + ".xacro"
     urdf_file = file_path + Robot_name + ".urdf"
@@ -74,11 +74,12 @@ if __name__ == "__main__":
         fix_inertia_values(urdf_file, output_urdf_path)
         print(f"Modified URDF saved to {output_urdf_path}")
 
-    # urdf -> mjcf 변환
+    if not os.path.exists(file_path + Robot_name + ".xml"):
+        # urdf -> mjcf 변환
 
-    # mjcf stl 위치 수정
-    os.system(f"cd {file_path} && cp ../col_meshes/* {file_path}")
+        # mjcf stl 위치 수정
+        os.system(f"cd {file_path} && cp ../col_meshes/* {file_path}")
 
-    model = mujoco.MjModel.from_xml_path(output_urdf_path)
-    mujoco.mj_saveLastXML(file_path + Robot_name + ".xml", model)
+        model = mujoco.MjModel.from_xml_path(output_urdf_path)
+        mujoco.mj_saveLastXML(file_path + Robot_name + ".xml", model)
 
