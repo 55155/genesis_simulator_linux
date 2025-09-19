@@ -6,6 +6,10 @@
 2025.09.15
 ![Peek 2025-09-15 06-57](https://github.com/user-attachments/assets/ae2fa41e-6cd1-4523-a1f1-f777b2320186)
 
+2025.09.19
+![첫성공Peek 2025-09-19 02-29](https://github.com/user-attachments/assets/b174b845-7780-4964-a0b9-6b2d5885157f)
+
+
 I am expressing a crank-slider mechanism through Genesis and MuJoCo.
 
 The latest version is:
