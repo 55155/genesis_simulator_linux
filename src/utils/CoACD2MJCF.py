@@ -1,7 +1,7 @@
-'''import os
+import os
 
 # OBJ 파일이 있는 폴더 경로 (실제 경로로 수정)
-folder_path = "/home/seongjin/Desktop/Seongjin/genesis_simulation_on_linux/My_asset/Crank_slider_system_V3_description/urdf/"
+folder_path = "/home/seongjin/Desktop/Seongjin/genesis_simulation_on_linux/My_asset/Crank_slider_system_V3_Pjoint_description/urdf/"
 
 # 폴더 내 모든 .obj 파일 리스트
 obj_files = [f for f in os.listdir(folder_path) if f.lower().endswith('.obj')]
@@ -72,3 +72,4 @@ for i, obj_file in enumerate(sorted(obj_files)):
 output_path = os.path.join(folder_path, 'mesh_list.txt')
 with open(output_path, 'w') as f:
     f.write('\n'.join(output_lines))
+'''
