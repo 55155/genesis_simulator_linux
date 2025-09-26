@@ -9,6 +9,13 @@
 2025.09.19
 ![첫성공Peek 2025-09-19 02-29](https://github.com/user-attachments/assets/b174b845-7780-4964-a0b9-6b2d5885157f)
 
+2025.09.26
+<img width="1305" height="1013" alt="Screenshot from 2025-09-19 05-36-15" src="https://github.com/user-attachments/assets/df125d59-f087-4cff-a80b-d11573796e40" />
+Tablet modeling
+https://github.com/user-attachments/assets/2a1b2536-8581-4f85-a897-02ff8d862753
+
+
+
 
 I am expressing a crank-slider mechanism through Genesis and MuJoCo.
 
