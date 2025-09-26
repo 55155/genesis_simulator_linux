@@ -115,7 +115,7 @@
     </body>
   </worldbody>
   <actuator>
-    <motor joint="Revolute 47" ctrlrange="-3 3" ctrllimited="true" forcerange = "-3 3" gear = "0.01"/>
+    <motor joint="Revolute 47" ctrlrange="-2 2" ctrllimited="true" forcerange = "-3 3" gear = "0.02"/>
   </actuator>
   <equality>
     <weld body1="Link3_1" body2 = "Shaft_1" anchor = "0 0 0"/>

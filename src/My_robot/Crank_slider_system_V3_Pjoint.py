@@ -18,7 +18,7 @@ scene = gs.Scene(
         camera_pos=(3.5, 0.0, 2.5),
         camera_lookat=(0.0, 0.0, 0.5),
         camera_fov=40,
-        max_FPS=60,
+        max_FPS=30,
     ),
     vis_options=gs.options.VisOptions(
         show_world_frame=True,
@@ -82,14 +82,15 @@ crank_velocity = 1/3* np.pi  # 1/3 pi rad/s
 vel_command = np.array([crank_velocity,0,0,0])
 
 # force command
-crank_force = np.array([2.8,0,0,0])
+crank_torque = 2.8  # N·m
+force_command = np.array([crank_torque,0,0,0])
 
 cam.start_recording()
 normal = cam.render()
 iter = 1000
 
 my_link.set_dofs_kp(
-    kp = np.array([1,1,1,1]),
+    kp = np.array([0.1,.1,.1,.1]),
     dofs_idx_local = dofs_idx,
 )
 my_link.set_dofs_kv(
@@ -102,7 +103,7 @@ my_link.set_dofs_kv(
 #     upper = (0.0625, 0, 0,0.0), 
 # )
 my_link.control_dofs_velocity(vel_command, dofs_idx)
-my_link.control_dofs_force()
+my_link.control_dofs_force(force_command, dofs_idx)
 # my_link.control_dofs_position(pos_command, dofs_idx)
 print(my_link.get_dofs_force())
 
