@@ -45,7 +45,7 @@ if __name__ == "__main__":
         config = yaml.safe_load(file)
 
     asset_path = config["file_path"]["asset"]
-    Robot_name = "Crank_slider_system_V3_Pjoint"
+    Robot_name = "dummy_tablet"
     file_path = asset_path + Robot_name + "_description" + "/urdf/"
     xacro_file = file_path + Robot_name + ".xacro"
     urdf_file = file_path + Robot_name + ".urdf"
