@@ -2,7 +2,7 @@ import numpy as np
 import genesis as gs
 import yaml
 # /home/seongjin/Desktop/Seongjin/genesis_simulation_on_linux/My_asset/Tablet/Tablet_description.xml
-
+# delete equality tag in xml to see the effect of equality constraint
 with open('/home/seongjin/Desktop/Seongjin/genesis_simulation_on_linux/src/config.yaml', 'r') as file:
     config = yaml.load(file, Loader=yaml.Loader)
 gs.init(backend=gs.cuda)
@@ -33,6 +33,7 @@ scene = gs.Scene(
 plane = scene.add_entity(gs.morphs.Plane(
     pos = (0, 0, 0),
 ))
+solver = scene.sim.rigid_solver
 # Adding a drone entity to the scene
 fn='/home/seongjin/Desktop/Seongjin/' \
     'genesis_simulation_on_linux/My_asset/Tablet/Tablet_description.xml'
@@ -44,10 +45,17 @@ tablet = scene.add_entity(
                     euler = (0,0,0), 
                     decimate = False, 
                     convexify = False,),
-    gs.materials.MPM.sand()
 )
+body_name = ["Tablet", "segment"]
+link_idx = [tablet.get_link(name).idx_local for name in body_name]
+link1 = tablet.get_link(body_name[0])
+link2 = tablet.get_link(body_name[1])
+link1_idx_arr = np.array(link1.idx, dtype=gs.np_int)
+link2_idx_arr = np.array(link2.idx, dtype=gs.np_int)
+
 scene.build()
 
+solver.add_weld_constraint(link1_idx_arr, link2_idx_arr)
 for i in range(1000):
     scene.step()
     if i == 500:
@@ -55,5 +63,6 @@ for i in range(1000):
         tablet.equalities[:] = []
         print("After clearing equalities", tablet.equalities)
         state = scene.get_state()
-        scene.reset(state)
+        solver.delete_weld_constraint(link1_idx_arr, link2_idx_arr)
+        scene.reset()
         print("After clearing equalities", tablet.equalities)
