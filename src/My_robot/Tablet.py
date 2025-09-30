@@ -34,10 +34,16 @@ plane = scene.add_entity(gs.morphs.Plane(
     pos = (0, 0, 0),
 ))
 # Adding a drone entity to the scene
+fn='/home/seongjin/Desktop/Seongjin/' \
+    'genesis_simulation_on_linux/My_asset/Tablet/Tablet_description.xml'
 
 tablet = scene.add_entity(
-    gs.morphs.MJCF(file = '/home/seongjin/Desktop/Seongjin/genesis_simulation_on_linux/My_asset/Tablet/Tablet_description.xml',
-                    scale = 10.0, pos = (0,0,10), euler = (0,0,0), decimate = False, convexify = False,),
+    gs.morphs.MJCF(file = fn,
+                    scale = 10.0, 
+                    pos = (0,0,10), 
+                    euler = (0,0,0), 
+                    decimate = False, 
+                    convexify = False,),
 )
 scene.build()
 
