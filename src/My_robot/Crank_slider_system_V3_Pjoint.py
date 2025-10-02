@@ -35,12 +35,13 @@ scene = gs.Scene(
 plane = scene.add_entity(gs.morphs.Plane(
     pos = (0, 0, 0),
 ))
+solver = scene.sim.rigid_solver
 
 # Adding a drone entity to the scene
 # franka = scene.add_entity(
 #     gs.morphs.URDF(file = 'urdf/drones/racer.urdf'),
 # )
-fn = '/home/seongjin/Desktop/Seongjin/genesis_simulation_on_linux/My_asset/Crank_slider_system_V3_Pjoint_description/urdf/Crank_slider_system_V3_Pjoint.xml'
+fn = '/home/seongjin/Desktop/Seongjin/genesis_simulation_on_linux/My_asset/Crank_slider_system_V3_Pjoint_description/urdf/Crank_slider_system_V3_Pjoint_sensor.xml'
 
 # Adding a My_link entity to the scene
 my_link = scene.add_entity(
@@ -60,6 +61,21 @@ cam = scene.add_camera(
 
 scene.build()
 
+link_name = [
+    "motor_shaft_1",
+    "Link2_1",
+    "Link3_1",
+    "Shaft_1",
+]
+links = [my_link.get_link(name) for name in link_name]
+link_idx = {link_name[i]: [None, None] for i in range(len(link_name))}
+
+# na전역 0, 지역 1
+for i, name in enumerate(link_name):
+    link_idx[name][0] = links[i].idx
+    link_idx[name][1] = links[i].idx_local
+
+
 jnt_names = [
     'Revolute 47',
     'Revolute 49',
@@ -69,6 +85,7 @@ jnt_names = [
 dofs_idx = [my_link.get_joint(name).dof_idx_local for name in jnt_names]
 
 print(dofs_idx)
+# solver.add_weld_constraint(np.array(link_idx["Shaft_1"][0], dtype=gs.np_int), np.array(link_idx["Link3_1"][0], dtype=gs.np_int))
 
 # for parallelization
 # pos_command = np.array([1000,0,0,0])
@@ -102,8 +119,9 @@ my_link.set_dofs_kv(
 #     lower = (-0.0625, 0, 0,0.0),
 #     upper = (0.0625, 0, 0,0.0), 
 # )
-my_link.control_dofs_velocity(vel_command, dofs_idx)
 my_link.control_dofs_force(force_command, dofs_idx)
+my_link.control_dofs_velocity(vel_command, dofs_idx)
+
 # my_link.control_dofs_position(pos_command, dofs_idx)
 print(my_link.get_dofs_force())
 
@@ -116,4 +134,4 @@ for i in range(iter):
     cam.render()
 
 
-cam.stop_recording(save_to_filename = config['file_path']['video']+'/'+fn.split('/')[-1]+"_실제속도_tmep_20250922.mp4")
+cam.stop_recording(save_to_filename = config['file_path']['video']+'/'+fn.split('/')[-1]+"_시뮬레이터_constraint_20251002.mp4")

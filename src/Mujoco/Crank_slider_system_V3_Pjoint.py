@@ -1,7 +1,7 @@
 import mujoco
 import numpy as np
-
-model = mujoco.MjModel.from_xml_string("/home/seongjin/Desktop/Seongjin/genesis_simulation_on_linux/My_asset/Crank_slider_system_V3_Pjoint_description/urdf/Crank_slider_system_V3_Pjoint.xml")
+path = "/home/seongjin/Desktop/Seongjin/genesis_simulation_on_linux/My_asset/Crank_slider_system_V3_Pjoint_description/urdf/Crank_slider_system_V3_Pjoint.xml"
+model = mujoco.MjModel.from_xml_string(path)
 sim = mujoco.MjModel.MjSim(model)
 viewer = mujoco.MjModel.MjViewer(sim)
 

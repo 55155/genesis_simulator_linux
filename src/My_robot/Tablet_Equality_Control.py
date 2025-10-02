@@ -33,6 +33,14 @@ scene = gs.Scene(
 plane = scene.add_entity(gs.morphs.Plane(
     pos = (0, 0, 0),
 ))
+cam = scene.add_camera(
+    res=(1280, 960),
+    pos=(2.0 * np.sin(1 / 60), 2.0 * np.cos(np.pi), 1),
+    lookat=(0, 0, 0.0),
+    fov=30,
+    
+    GUI=True,
+)
 solver = scene.sim.rigid_solver
 # Adding a drone entity to the scene
 fn='/home/seongjin/Desktop/Seongjin/' \
@@ -60,9 +68,8 @@ for i in range(1000):
     scene.step()
     if i == 500:
         print("Resetting tablet position and clearing equalities", tablet.equalities)
-        tablet.equalities[:] = []
         print("After clearing equalities", tablet.equalities)
-        state = scene.get_state()
         solver.delete_weld_constraint(link1_idx_arr, link2_idx_arr)
-        scene.reset()
+        state = scene.get_state()
+        scene.reset(state)
         print("After clearing equalities", tablet.equalities)

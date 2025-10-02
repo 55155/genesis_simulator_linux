@@ -115,10 +115,12 @@
     </body>
   </worldbody>
   <actuator>
-    <motor joint="Revolute 47" ctrlrange="-2 2" ctrllimited="true" forcerange = "-3 3" gear = "0.02"/>
+    <motor name="torque_servo" joint="Revolute 47" ctrlrange="-2 2" ctrllimited="true" forcerange = "-3 3" gear = ".01"/> -->
+    <!-- <position name="position_servo" joint="Revolute 47" ctrlrange="-100 100" ctrllimited="true" kp="100"/>
+     <velocity name="velocity_servo" joint="Revolute 47" kv="10"/> -->
   </actuator>
   <equality>
-    <weld body1="Link3_1" body2 = "Shaft_1" anchor = "0 0 0"/>
+    <weld body1="Link3_1" body2 = "Shaft_1" anchor = "0 0 0" solref = "0.001 1" solimp = "0.99 0.999 0.001"/>
   </equality>
   <sensor>
     <force site="touch_sensor"/>
