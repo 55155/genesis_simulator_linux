@@ -15,7 +15,6 @@ xml = """
 </mujoco>
 """
 
-
 # XML 파일로부터 모델 로드
 model = mujoco.MjModel.from_xml_string(xml)
 data = mujoco.MjData(model)

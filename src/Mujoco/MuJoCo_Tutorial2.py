@@ -2,8 +2,8 @@ import time
 
 import mujoco
 import mujoco.viewer
-
-path = "/home/seongjin/Desktop/Seongjin/genesis_simulation_on_linux/My_asset/Crank_slider_system_V3_Pjoint_description/urdf/Crank_slider_system_V3_Pjoint_sensor.xml"
+path = "/Users/csrc_autonomouslab/Desktop/Seongjin/genesis_simulator_linux/My_asset/Crank_slider_system_V3_Pjoint_description/urdf/Crank_slider_system_V3_Pjoint_sensor.xml"
+# path = "/home/seongjin/Desktop/Seongjin/genesis_simulation_on_linux/My_asset/Crank_slider_system_V3_Pjoint_description/urdf/Crank_slider_system_V3_Pjoint_sensor.xml"
 m = mujoco.MjModel.from_xml_path(path)
 d = mujoco.MjData(m)
 
