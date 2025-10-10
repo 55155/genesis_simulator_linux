@@ -1,11 +1,31 @@
 import numpy as np
 import genesis as gs
 import yaml
+import argparse
 # /home/seongjin/Desktop/Seongjin/genesis_simulation_on_linux/My_asset/Tablet/Tablet_description.xml
+# "/Users/csrc_autonomouslab/Desktop/Seongjin/genesis_simulator_linux/src/config.yaml"
 # delete equality tag in xml to see the effect of equality constraint
-with open('/home/seongjin/Desktop/Seongjin/genesis_simulation_on_linux/src/config.yaml', 'r') as file:
-    config = yaml.load(file, Loader=yaml.Loader)
-gs.init(backend=gs.cuda)
+import os
+pre_path = os.getcwd()
+
+parser = argparse.ArgumentParser()
+parser.add_argument("-dt", "--timestep", type=float, default=0.01, help="Simulation time step")
+parser.add_argument("-v", "--vis", action="store_true", default=True, help="Show visualization GUI")
+parser.add_argument("-nv", "--no-vis", action="store_false", dest="vis", help="Disable visualization GUI")
+parser.add_argument("-c", "--cpu", action="store_true", help="Use CPU instead of GPU")
+parser.add_argument("-t", "--seconds", type=float, default=2.0, help="Number of seconds to simulate")
+parser.add_argument("-f", "--force", action="store_true", default=True, help="Use ContactForceSensor (xyz float)")
+parser.add_argument("-nf", "--no-force", action="store_false", dest="force", help="Use ContactSensor (boolean)")
+
+args = parser.parse_args()
+try:
+    with open(pre_path+"/src/config.yaml", 'r') as file:
+        config = yaml.load(file, Loader=yaml.Loader)
+except FileNotFoundError as e:
+    print(e)
+
+gs.init(backend=gs.metal if args.cpu else gs.gpu, logging_level=None)
+
 scene = gs.Scene(
     show_viewer=True,
     sim_options= gs.options.SimOptions(
@@ -43,8 +63,7 @@ cam = scene.add_camera(
 )
 solver = scene.sim.rigid_solver
 # Adding a drone entity to the scene
-fn='/home/seongjin/Desktop/Seongjin/' \
-    'genesis_simulation_on_linux/My_asset/Tablet/Tablet_description.xml'
+fn= pre_path + '/My_asset/Tablet/Tablet_description.xml'
 
 tablet = scene.add_entity(
     gs.morphs.MJCF( file = fn,
@@ -73,3 +92,4 @@ for i in range(1000):
         state = scene.get_state()
         scene.reset(state)
         print("After clearing equalities", tablet.equalities)
+

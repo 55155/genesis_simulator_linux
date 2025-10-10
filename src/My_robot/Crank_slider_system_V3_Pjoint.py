@@ -2,15 +2,15 @@ import genesis as gs
 import yaml
 import numpy as np
 
-with open('/home/seongjin/Desktop/Seongjin/genesis_simulation_on_linux/src/config.yaml', 'r') as file:
-    config = yaml.load(file, Loader=yaml.Loader)
+# with open('/home/seongjin/Desktop/Seongjin/genesis_simulation_on_linux/src/config.yaml', 'r') as file:
+#     config = yaml.load(file, Loader=yaml.Loader)
 
-gs.init(backend=gs.cuda)
+gs.init(backend=gs.metal)
 
 scene = gs.Scene(
     show_viewer=True,
     sim_options= gs.options.SimOptions(
-        dt = 0.1,
+        dt = 0.01,
         gravity=(0.0, 0.0, -9.81),
     ),
     viewer_options=gs.options.ViewerOptions(
@@ -42,7 +42,8 @@ solver = scene.sim.rigid_solver
 #     gs.morphs.URDF(file = 'urdf/drones/racer.urdf'),
 # )
 # macos 
-fn = '/Users/csrc_autonomouslab/Desktop/Seongjin/genesis_simulator_linux/My_asset/Crank_slider_system_V3_Pjoint_description/urdf/Crank_slider_system_V3_Pjoint_sensor.xml'
+fn = f'/Users/csrc_autonomouslab/Desktop/Seongjin/genesis_simulator_linux/My_asset/Crank_slider_system_V3_Pjoint_description/urdf/Crank_slider_system_V3_Pjoint_sensor_V2.xml'
+
 # linux
 # fn = '/home/seongjin/Desktop/Seongjin/genesis_simulation_on_linux/My_asset/Crank_slider_system_V3_Pjoint_description/urdf/Crank_slider_system_V3_Pjoint_sensor.xml'
 
@@ -102,7 +103,7 @@ crank_velocity = 1/3* np.pi  # 1/3 pi rad/s
 vel_command = np.array([crank_velocity,0,0,0])
 
 # force command
-crank_torque = 2.8  # N·m
+crank_torque = 2.0  # N·m
 force_command = np.array([crank_torque,0,0,0])
 
 cam.start_recording()
@@ -123,18 +124,21 @@ my_link.set_dofs_kv(
 #     upper = (0.0625, 0, 0,0.0), 
 # )
 my_link.control_dofs_force(force_command, dofs_idx)
-my_link.control_dofs_velocity(vel_command, dofs_idx)
+# my_link.control_dofs_velocity(vel_command, dofs_idx)
 
 # my_link.control_dofs_position(pos_command, dofs_idx)
 print(my_link.get_dofs_force())
 
 for i in range(iter):
     scene.step()
+    my_link.control_dofs_force(force_command, dofs_idx)
+
     cam.set_pose(
         pos=(1.0,0.5, 0.5),
         lookat=(0,0.2,0.0),
     )
+    print(my_link.get_dofs_force())
     cam.render()
 
 
-cam.stop_recording(save_to_filename = config['file_path']['video']+'/'+fn.split('/')[-1]+"_시뮬레이터_constraint_20251002.mp4")
+# cam.stop_recording(save_to_filename = config['file_path']['video']+'/'+fn.split('/')[-1]+"_시뮬레이터_constraint_20251002.mp4")
