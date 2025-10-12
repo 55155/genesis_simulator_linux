@@ -77,7 +77,7 @@ def main():
             file = "My_asset/Crank_slider_system_V3_Pjoint_description/urdf/" \
             "Crank_slider_system_V3_Pjoint_sensor_V2.xml",
             euler = (90,0,90),
-            pos = (-0.3, 0.0, 0),
+            pos = (0, 0.0, 0),
             scale = 1.0,
         )
     )
@@ -97,7 +97,7 @@ def main():
         link_idx[name][0] = links[i].idx
         link_idx[name][1] = links[i].idx_local
 
-
+    # Crank-slider system Joint index
     jnt_names = [
         'Revolute 47',
         'Revolute 49',
@@ -106,20 +106,25 @@ def main():
     ]
     dofs_idx = [Crank_slider_system.get_joint(name).dof_idx_local for name in jnt_names]
 
-
-    # tablet position = 0.353 0.01 -0.22 -> 90 0 90 euler
-
     tablet_link_name = ("Tablet", "segment")
     tablet = scene.add_entity(
         gs.morphs.MJCF(
             file = "My_asset/Tablet/Tablet_description.xml",
             # Crank_slider_system, Wall position = 0.353 0.01 -0.22
             # euler = (90,0,90),
-            pos = (-.3, 0, 0),
+            pos = (0, 0, 0),
             scale = 10.0,
         )
     )
     
+    # Tablet link
+    tablet_links = [tablet.get_link(name) for name in tablet_link_name]
+    tablet_link_idx = {tablet_link_name[i]: [None, None] for i in range(len(tablet_link_name))}
+    for i, name in enumerate(tablet_link_name):
+        tablet_link_idx[name][0] = tablet_links[i].idx
+        tablet_link_idx[name][1] = tablet_links[i].idx_local
+    print(tablet_link_idx)
+
     for link_name in tablet_link_name:
         if args.force:
             sensor_options = gs.sensors.ContactForce(
@@ -153,14 +158,27 @@ def main():
     ## scene build
     scene.build()
     # 특정 link 의 좌표를 가져올 수 있는 게 아닌, 전체 Entity 의 좌표를 가져오는 것임.
-    print("Wall_position : ",Crank_slider_system.get_links_pos(link_idx["Wall_1"][1]))
-    print("Tablet_position : ",Crank_slider_system.get_links_pos(tablet.get_link("Tablet").idx_local))
-    cam.start_recording()
+    print("Wall_position : ", Crank_slider_system.get_links_pos(link_idx["Wall_1"][0]), Crank_slider_system.get_links_pos(link_idx["Wall_1"][1]) )
+    print("Tablet_position : ", tablet.get_links_pos(tablet_link_idx["Tablet"][0]), tablet.get_links_pos(tablet_link_idx["Tablet"][1]))
+    
+
+    # Equality constraint
     link1 = tablet.get_link(tablet_link_name[0])
     link2 = tablet.get_link(tablet_link_name[1])
     link1_idx_arr = np.array(link1.idx, dtype=gs.np_int)
     link2_idx_arr = np.array(link2.idx, dtype=gs.np_int)
     solver.add_weld_constraint(link1_idx_arr, link2_idx_arr)
+
+    # Wall position global : (-0.4435, 0.1300, 0.0500), local tablet_pos = (-0.3, 0.0, 0.0)
+    # Wall position == Tablet position
+    # tablet position = 0.353 0.01 -0.22 -> 90 0 90 euler
+    
+    tablet_pos = Crank_slider_system.get_links_pos(link_idx["Wall_1"][0])
+    tablet_pos = tablet_pos.tolist()
+    print(tablet_pos)
+    tablet.set_pos(pos = tablet_pos[0])
+
+    cam.start_recording()
 
     try:
         steps = int(args.seconds / args.timestep) if "PYTEST_VERSION" not in os.environ else 10
