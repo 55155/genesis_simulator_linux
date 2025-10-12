@@ -3,6 +3,24 @@ import os
 import numpy as np  
 from tqdm import tqdm
 
+import roma
+import torch
+
+# 오일러 각을 회전 행렬로 변환
+euler_angles = [90, 0, 90]  # degrees
+R = roma.euler_to_rotmat('XYZ', euler_angles, degrees=True)
+
+# # Rigid 변환 생성
+# T = roma.Rigid(linear=R, translation=torch.zeros(3))
+
+# # 포인트 변환
+# points = torch.tensor([[1.0, 1.0, 1.0]])
+# transformed_points = T[None].apply(points)
+
+# print(transformed_points)
+
+
+
 import genesis as gs
 from genesis.recorders.plotters import IS_MATPLOTLIB_AVAILABLE, IS_PYQTGRAPH_AVAILABLE
 
@@ -89,11 +107,15 @@ def main():
     dofs_idx = [Crank_slider_system.get_joint(name).dof_idx_local for name in jnt_names]
 
 
+    # tablet position = 0.353 0.01 -0.22 -> 90 0 90 euler
+
     tablet_link_name = ("Tablet", "segment")
     tablet = scene.add_entity(
         gs.morphs.MJCF(
             file = "My_asset/Tablet/Tablet_description.xml",
             # Crank_slider_system, Wall position = 0.353 0.01 -0.22
+            # euler = (90,0,90),
+            pos = (-.3, 0, 0),
             scale = 10.0,
         )
     )
@@ -130,6 +152,9 @@ def main():
 
     ## scene build
     scene.build()
+    # 특정 link 의 좌표를 가져올 수 있는 게 아닌, 전체 Entity 의 좌표를 가져오는 것임.
+    print("Wall_position : ",Crank_slider_system.get_links_pos(link_idx["Wall_1"][1]))
+    print("Tablet_position : ",Crank_slider_system.get_links_pos(tablet.get_link("Tablet").idx_local))
     cam.start_recording()
     link1 = tablet.get_link(tablet_link_name[0])
     link2 = tablet.get_link(tablet_link_name[1])
@@ -153,3 +178,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+# Wall 의 시뮬레이션 상 좌표 : 0.353 0.01 -0.22 .. ?
