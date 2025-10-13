@@ -55,7 +55,7 @@ def main():
     tablet_link_name = ("Tablet", "segment")
     tablet = scene.add_entity(
         gs.morphs.MJCF(
-            file = "My_asset/Tablet/Tablet_description.xml",
+            file = "My_asset/Tablet_posmod/Tablet_posmod.xml",
             pos = (0, 0, 5.0),
             scale = 10.0,
         )
@@ -94,11 +94,11 @@ def main():
     ## scene build
     scene.build()
     cam.start_recording()
-    link1 = tablet.get_link(tablet_link_name[0])
-    link2 = tablet.get_link(tablet_link_name[1])
-    link1_idx_arr = np.array(link1.idx, dtype=gs.np_int)
-    link2_idx_arr = np.array(link2.idx, dtype=gs.np_int)
-    solver.add_weld_constraint(link1_idx_arr, link2_idx_arr)
+    # link1 = tablet.get_link(tablet_link_name[0])
+    # link2 = tablet.get_link(tablet_link_name[1])
+    # link1_idx_arr = np.array(link1.idx, dtype=gs.np_int)
+    # link2_idx_arr = np.array(link2.idx, dtype=gs.np_int)
+    # solver.add_weld_constraint(link1_idx_arr, link2_idx_arr)
 
     try:
         steps = int(args.seconds / args.timestep) if "PYTEST_VERSION" not in os.environ else 10
@@ -110,7 +110,7 @@ def main():
         gs.logger.info("Simulation interrupted, exiting.")
     finally:
         gs.logger.info("Simulation finished.")
-        cam.stop_recording(save_to_filename ="video/SensorTEST_V2_20251010.mp4")
+        cam.stop_recording(save_to_filename ="video/SensorTEST_V2_20251014.mp4")
         scene.stop_recording()
 
 

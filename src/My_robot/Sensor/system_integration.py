@@ -30,14 +30,15 @@ def main():
     parser.add_argument("-v", "--vis", action="store_true", default=True, help="Show visualization GUI")
     parser.add_argument("-nv", "--no-vis", action="store_false", dest="vis", help="Disable visualization GUI")
     parser.add_argument("-c", "--cpu", action="store_true", help="Use CPU instead of GPU")
-    parser.add_argument("-t", "--seconds", type=float, default=10.0, help="Number of seconds to simulate")
+    parser.add_argument("-t", "--seconds", type=float, default=2.0, help="Number of seconds to simulate")
     parser.add_argument("-f", "--force", action="store_true", default=True, help="Use ContactForceSensor (xyz float)")
     parser.add_argument("-nf", "--no-force", action="store_false", dest="force", help="Use ContactSensor (boolean)")
 
     args = parser.parse_args()
 
     ########################## init ##########################
-    gs.init(backend=gs.cuda if args.cpu else gs.gpu, logging_level=None)
+    gs.init(backend=gs.metal)
+    # gs.init(backend=gs.cpu if args.cpu else gs.gpu, logging_level=None)
 
     ########################## scene setup ##########################
     scene = gs.Scene(
@@ -51,8 +52,11 @@ def main():
         vis_options=gs.options.VisOptions(
             show_world_frame=True,
         ),
+        viewer_options=gs.options.ViewerOptions(
+            max_FPS=20,
+        ),
         profiling_options=gs.options.ProfilingOptions(
-            show_FPS=False,
+            show_FPS=True,
         ),
         show_viewer=args.vis,
     )
@@ -77,8 +81,11 @@ def main():
             file = "My_asset/Crank_slider_system_V3_Pjoint_Posmod_description/urdf/" \
             "Crank_slider_system_V3_Pjoint_Posmod.xml",
             pos = (0, 0.0, 0),
-            scale = 1.0,
-        )
+            scale = 10.0,
+        ),
+        surface=gs.surfaces.Default(
+            smooth=False,
+        ),
     )
 
     link_name = [
@@ -111,8 +118,8 @@ def main():
             file = "My_asset/Tablet_posmod/Tablet_posmod.xml",
             # Crank_slider_system, Wall position = 0.353 0.01 -0.22
             # euler = (90,0,90),
-            pos = (0, 0, 0),
-            scale = 1.0,
+            pos = (-0.48, 3.36, 5),
+            scale = 10.0,
         )
     )
 
@@ -177,28 +184,28 @@ def main():
     tablet_pos = tablet_pos.tolist()
     tablet_pos[0][2] += 0.05  # Wall 의 두께 고려
     print(tablet_pos)
-    tablet.set_pos(pos = tablet_pos[0])
+    # tablet.set_pos(pos = tablet_pos[0])
 
     # 특정 link 의 좌표를 가져올 수 있는 게 아닌, 전체 Entity 의 좌표를 가져오는 것임.
     print("Wall_position : ", Crank_slider_system.get_links_pos())
     print("Tablet_position : ", tablet.get_links_pos(), tablet.get_pos())
-    # cam.start_recording()
+    cam.start_recording()
 
     try:
         # second: 10, timestep = 0.01
         steps = int(args.seconds / args.timestep) if "PYTEST_VERSION" not in os.environ else 10
         print("steps : ", steps)
-        for _ in range(steps):
+        for _ in tqdm(range(steps)):
             # 일부 노이즈 발생. 
             # print(sensor.read())
-            # cam.render()
+            cam.render()
             scene.step()
     except KeyboardInterrupt:
         gs.logger.info("Simulation interrupted, exiting.")
     finally:
         gs.logger.info("Simulation finished.")
-        # cam.stop_recording(save_to_filename ="video/SensorTEST_V2_20251010.mp4")
-        # scene.stop_recording()
+        cam.stop_recording(save_to_filename ="video/SystemIntegration_Debug2_posmod_20251014.mp4")
+        scene.stop_recording()
 
 if __name__ == "__main__":
     main()
@@ -217,3 +224,20 @@ if __name__ == "__main__":
 #         [0., 0., 0.]], device='cuda:0')
 #
 #  [[-0.14350000023841858, 0.12999999523162842, 0.05000000074505806]]
+
+
+# 2025.10.14 수정 사항
+# 크기가 너무 커지거나 작아지면, 시각화 실패하는 줄 알았는데, 아님. 
+# 충돌이 발생하면, 시각화 화면이 black out 되는 듯 함.
+# fusion 360 기준으로 포지션 지정하는 게 좋음. 무슨 말이냐면, fusion 360의 오리진을 무조건 따라감.
+#   - 예를 들어서 (0, 0, 0) 을 기준으로 만들지 않으면 pos 지정이 애매해짐.
+
+
+# 2025.10.15 해야할것. 
+# pyLife 알아보기 -> SN 선도 근사할 아이디어 생각해보기
+# 위치는 대충 조정 된듯함. motor_shaft_1 의 각도 조정 dof_idx_position ,..? 이런 함수. 
+
+# Tablet posmod freejoint 제거하고, Wall 위치에 맞게 pos 조정하기. -> 완료
+# Tablet link 2개에 센서 부착 -> 완료
+# Tablet link 2개에 대한 좌표 출력 -> 완료
+# Tablet link 2개에 대한 센서 출력 -> 완료
