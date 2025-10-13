@@ -1,40 +1,40 @@
-import os
+# import os
 
-# OBJ 파일이 있는 폴더 경로 (실제 경로로 수정)
-folder_path = "/home/seongjin/Desktop/Seongjin/genesis_simulation_on_linux/My_asset/Crank_slider_system_V3_Pjoint_description/urdf/"
+# # OBJ 파일이 있는 폴더 경로 (실제 경로로 수정)
+# folder_path = "/home/seongjin/Desktop/Seongjin/genesis_simulation_on_linux/My_asset/Crank_slider_system_V3_Pjoint_description/urdf/"
 
-# 폴더 내 모든 .obj 파일 리스트
-obj_files = [f for f in os.listdir(folder_path) if f.lower().endswith('.obj')]
+# # 폴더 내 모든 .obj 파일 리스트
+# obj_files = [f for f in os.listdir(folder_path) if f.lower().endswith('.obj')]
 
-# scale 파라미터 (필요시 수정)
-scale_str = '0.001 0.001 0.001'
+# # scale 파라미터 (필요시 수정)
+# scale_str = '0.001 0.001 0.001'
 
-# 출력할 문자열 리스트
-output_lines = []
-for obj_file in sorted(obj_files):
-    abs_path = os.path.join(folder_path, obj_file)
-    Temp = os.path.splitext(obj_file)[0]
-    output_lines.append(f'<mesh name="{Temp}" file="{abs_path}" scale="{scale_str}"/>')
+# # 출력할 문자열 리스트
+# output_lines = []
+# for obj_file in sorted(obj_files):
+#     abs_path = os.path.join(folder_path, obj_file)
+#     Temp = os.path.splitext(obj_file)[0]
+#     output_lines.append(f'<mesh name="{Temp}" file="{abs_path}" scale="{scale_str}"/>')
 
-for obj_file in sorted(obj_files):
-    abs_path = os.path.join(folder_path, obj_file)
-    Temp = os.path.splitext(obj_file)[0]
-    # <geom rgba="0.7 0.7 0.7 1" type="mesh" mesh="Slider1_1_collision_(182)"/>
+# for obj_file in sorted(obj_files):
+#     abs_path = os.path.join(folder_path, obj_file)
+#     Temp = os.path.splitext(obj_file)[0]
+#     # <geom rgba="0.7 0.7 0.7 1" type="mesh" mesh="Slider1_1_collision_(182)"/>
     
-    # 색상 바꾸는 것 고려
-    output_lines.append(f'<geom rgba="0.7 0.7 0.7 1" type="mesh" mesh="{Temp}"/>')
+#     # 색상 바꾸는 것 고려
+#     output_lines.append(f'<geom rgba="0.7 0.7 0.7 1" type="mesh" mesh="{Temp}"/>')
 
-# txt 파일로 저장
-output_path = os.path.join(folder_path, 'mesh_list.txt')
-with open(output_path, 'w') as f:
-    f.write('\n'.join(output_lines))
+# # txt 파일로 저장
+# output_path = os.path.join(folder_path, 'mesh_list.txt')
+# with open(output_path, 'w') as f:
+#     f.write('\n'.join(output_lines))
 
-'''
+
 import os
 import colorsys
 
 # Tablet만 다양한 색상으로 적용
-folder_path = "/home/seongjin/Desktop/Seongjin/genesis_simulation_on_linux/My_asset/Tablet/"
+folder_path = "/home/seongjin/Desktop/Seongjin/genesis_simulation_on_linux/My_asset/Tablet_posmod/"
 
 obj_files = [f for f in os.listdir(folder_path) if f.lower().endswith('.obj')]
 scale_str = '0.001 0.001 0.001'
@@ -72,4 +72,3 @@ for i, obj_file in enumerate(sorted(obj_files)):
 output_path = os.path.join(folder_path, 'mesh_list.txt')
 with open(output_path, 'w') as f:
     f.write('\n'.join(output_lines))
-'''

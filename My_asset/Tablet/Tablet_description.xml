@@ -1,26 +1,26 @@
 <!-- mass 와 inertia 가 없네.. -->
 <mujoco>
     <asset>
-        <mesh name="Tablet" file="./Tablet.obj" scale="0.001 0.001 0.001"/>
-        <mesh name="Tablet_collision_(1)" file="./Tablet_collision_(1).obj" scale="0.001 0.001 0.001"/>
-        <mesh name="Tablet_collision_(10)" file="./Tablet_collision_(10).obj" scale="0.001 0.001 0.001"/>
-        <mesh name="Tablet_collision_(11)" file="./Tablet_collision_(11).obj" scale="0.001 0.001 0.001"/>
-        <mesh name="Tablet_collision_(12)" file="./Tablet_collision_(12).obj" scale="0.001 0.001 0.001"/>
-        <mesh name="Tablet_collision_(13)" file="./Tablet_collision_(13).obj" scale="0.001 0.001 0.001"/>
-        <mesh name="Tablet_collision_(14)" file="./Tablet_collision_(14).obj" scale="0.001 0.001 0.001"/>
-        <mesh name="Tablet_collision_(15)" file="./Tablet_collision_(15).obj" scale="0.001 0.001 0.001"/>
-        <mesh name="Tablet_collision_(2)" file="./Tablet_collision_(2).obj" scale="0.001 0.001 0.001"/>
-        <mesh name="Tablet_collision_(3)" file="./Tablet_collision_(3).obj" scale="0.001 0.001 0.001"/>
-        <mesh name="Tablet_collision_(4)" file="./Tablet_collision_(4).obj" scale="0.001 0.001 0.001"/>
-        <mesh name="Tablet_collision_(5)" file="./Tablet_collision_(5).obj" scale="0.001 0.001 0.001"/>
-        <mesh name="Tablet_collision_(6)" file="./Tablet_collision_(6).obj" scale="0.001 0.001 0.001"/>
-        <mesh name="Tablet_collision_(7)" file="./Tablet_collision_(7).obj" scale="0.001 0.001 0.001"/>
-        <mesh name="Tablet_collision_(8)" file="./Tablet_collision_(8).obj" scale="0.001 0.001 0.001"/>
-        <mesh name="Tablet_collision_(9)" file="./Tablet_collision_(9).obj" scale="0.001 0.001 0.001"/>
+        <mesh name="Tablet" file="/home/seongjin/Desktop/Seongjin/genesis_simulation_on_linux/My_asset/Tablet/Tablet.obj" scale="0.001 0.001 0.001"/>
+        <mesh name="Tablet_collision_(1)" file="/home/seongjin/Desktop/Seongjin/genesis_simulation_on_linux/My_asset/Tablet/Tablet_collision_(1).obj" scale="0.001 0.001 0.001"/>
+        <mesh name="Tablet_collision_(10)" file="/home/seongjin/Desktop/Seongjin/genesis_simulation_on_linux/My_asset/Tablet/Tablet_collision_(10).obj" scale="0.001 0.001 0.001"/>
+        <mesh name="Tablet_collision_(11)" file="/home/seongjin/Desktop/Seongjin/genesis_simulation_on_linux/My_asset/Tablet/Tablet_collision_(11).obj" scale="0.001 0.001 0.001"/>
+        <mesh name="Tablet_collision_(12)" file="/home/seongjin/Desktop/Seongjin/genesis_simulation_on_linux/My_asset/Tablet/Tablet_collision_(12).obj" scale="0.001 0.001 0.001"/>
+        <mesh name="Tablet_collision_(13)" file="/home/seongjin/Desktop/Seongjin/genesis_simulation_on_linux/My_asset/Tablet/Tablet_collision_(13).obj" scale="0.001 0.001 0.001"/>
+        <mesh name="Tablet_collision_(14)" file="/home/seongjin/Desktop/Seongjin/genesis_simulation_on_linux/My_asset/Tablet/Tablet_collision_(14).obj" scale="0.001 0.001 0.001"/>
+        <mesh name="Tablet_collision_(15)" file="/home/seongjin/Desktop/Seongjin/genesis_simulation_on_linux/My_asset/Tablet/Tablet_collision_(15).obj" scale="0.001 0.001 0.001"/>
+        <mesh name="Tablet_collision_(2)" file="/home/seongjin/Desktop/Seongjin/genesis_simulation_on_linux/My_asset/Tablet/Tablet_collision_(2).obj" scale="0.001 0.001 0.001"/>
+        <mesh name="Tablet_collision_(3)" file="/home/seongjin/Desktop/Seongjin/genesis_simulation_on_linux/My_asset/Tablet/Tablet_collision_(3).obj" scale="0.001 0.001 0.001"/>
+        <mesh name="Tablet_collision_(4)" file="/home/seongjin/Desktop/Seongjin/genesis_simulation_on_linux/My_asset/Tablet/Tablet_collision_(4).obj" scale="0.001 0.001 0.001"/>
+        <mesh name="Tablet_collision_(5)" file="/home/seongjin/Desktop/Seongjin/genesis_simulation_on_linux/My_asset/Tablet/Tablet_collision_(5).obj" scale="0.001 0.001 0.001"/>
+        <mesh name="Tablet_collision_(6)" file="/home/seongjin/Desktop/Seongjin/genesis_simulation_on_linux/My_asset/Tablet/Tablet_collision_(6).obj" scale="0.001 0.001 0.001"/>
+        <mesh name="Tablet_collision_(7)" file="/home/seongjin/Desktop/Seongjin/genesis_simulation_on_linux/My_asset/Tablet/Tablet_collision_(7).obj" scale="0.001 0.001 0.001"/>
+        <mesh name="Tablet_collision_(8)" file="/home/seongjin/Desktop/Seongjin/genesis_simulation_on_linux/My_asset/Tablet/Tablet_collision_(8).obj" scale="0.001 0.001 0.001"/>
+        <mesh name="Tablet_collision_(9)" file="/home/seongjin/Desktop/Seongjin/genesis_simulation_on_linux/My_asset/Tablet/Tablet_collision_(9).obj" scale="0.001 0.001 0.001"/>
     </asset>
     <worldbody>
         <body name="Tablet">
-            <!-- <joint type = "free"/> -->
+            <joint type = "free"/>
             <geom rgba="0.675 0.465 0.325 1" type="mesh" mesh="Tablet_collision_(1)"/>
 
             <geom rgba="0.700 0.620 0.300 1" type="mesh" mesh="Tablet_collision_(10)"/>
@@ -48,10 +48,11 @@
             <geom rgba="0.975 0.025 0.785 1" type="mesh" mesh="Tablet_collision_(7)"/>
 
             <geom rgba="1.000 0.000 0.400 1" type="mesh" mesh="Tablet_collision_(8)"/>
+        
         </body>
 
         <body name="segment">
-            <!-- <joint type = "free"/> -->
+            <joint type = "free"/>
             <geom rgba="0.650 0.350 0.350 1" type="mesh" mesh="Tablet_collision_(9)"/>
         </body>
     </worldbody>

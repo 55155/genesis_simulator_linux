@@ -24,21 +24,20 @@ R = roma.euler_to_rotmat('XYZ', euler_angles, degrees=True)
 import genesis as gs
 from genesis.recorders.plotters import IS_MATPLOTLIB_AVAILABLE, IS_PYQTGRAPH_AVAILABLE
 
-
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("-dt", "--timestep", type=float, default=0.01, help="Simulation time step")
     parser.add_argument("-v", "--vis", action="store_true", default=True, help="Show visualization GUI")
     parser.add_argument("-nv", "--no-vis", action="store_false", dest="vis", help="Disable visualization GUI")
     parser.add_argument("-c", "--cpu", action="store_true", help="Use CPU instead of GPU")
-    parser.add_argument("-t", "--seconds", type=float, default=2.0, help="Number of seconds to simulate")
+    parser.add_argument("-t", "--seconds", type=float, default=10.0, help="Number of seconds to simulate")
     parser.add_argument("-f", "--force", action="store_true", default=True, help="Use ContactForceSensor (xyz float)")
     parser.add_argument("-nf", "--no-force", action="store_false", dest="force", help="Use ContactSensor (boolean)")
 
     args = parser.parse_args()
 
     ########################## init ##########################
-    gs.init(backend=gs.cpu if args.cpu else gs.gpu, logging_level=None)
+    gs.init(backend=gs.cuda if args.cpu else gs.gpu, logging_level=None)
 
     ########################## scene setup ##########################
     scene = gs.Scene(
@@ -72,16 +71,16 @@ def main():
     # add entities
     scene.add_entity(gs.morphs.Plane())
 
+    # Crank-slider system
     Crank_slider_system = scene.add_entity(
         gs.morphs.MJCF(
-            file = "My_asset/Crank_slider_system_V3_Pjoint_description/urdf/" \
-            "Crank_slider_system_V3_Pjoint_sensor_V2.xml",
-            euler = (90,0,90),
+            file = "My_asset/Crank_slider_system_V3_Pjoint_Posmod_description/urdf/" \
+            "Crank_slider_system_V3_Pjoint_Posmod.xml",
             pos = (0, 0.0, 0),
             scale = 1.0,
         )
     )
-    
+
     link_name = [
     "motor_shaft_1",
     "Link2_1",
@@ -91,7 +90,7 @@ def main():
     ]
     links = [Crank_slider_system.get_link(name) for name in link_name]
     link_idx = {link_name[i]: [None, None] for i in range(len(link_name))}
-    
+
     # 전역 0, 지역 1
     for i, name in enumerate(link_name):
         link_idx[name][0] = links[i].idx
@@ -109,14 +108,14 @@ def main():
     tablet_link_name = ("Tablet", "segment")
     tablet = scene.add_entity(
         gs.morphs.MJCF(
-            file = "My_asset/Tablet/Tablet_description.xml",
+            file = "My_asset/Tablet_posmod/Tablet_posmod.xml",
             # Crank_slider_system, Wall position = 0.353 0.01 -0.22
             # euler = (90,0,90),
             pos = (0, 0, 0),
-            scale = 10.0,
+            scale = 1.0,
         )
     )
-    
+
     # Tablet link
     tablet_links = [tablet.get_link(name) for name in tablet_link_name]
     tablet_link_idx = {tablet_link_name[i]: [None, None] for i in range(len(tablet_link_name))}
@@ -125,6 +124,7 @@ def main():
         tablet_link_idx[name][1] = tablet_links[i].idx_local
     print(tablet_link_idx)
 
+    # add sensors to the scene
     for link_name in tablet_link_name:
         if args.force:
             sensor_options = gs.sensors.ContactForce(
@@ -146,7 +146,9 @@ def main():
                 title=f"{link_name} Contact Sensor Data",
                 labels=["in_contact"],
             )
+
     sensor = scene.add_sensor(sensor_options)
+
     if IS_PYQTGRAPH_AVAILABLE:
         sensor.start_recording(gs.recorders.PyQtLinePlot(**plot_kwargs))
     elif IS_MATPLOTLIB_AVAILABLE:
@@ -157,44 +159,61 @@ def main():
 
     ## scene build
     scene.build()
-    # 특정 link 의 좌표를 가져올 수 있는 게 아닌, 전체 Entity 의 좌표를 가져오는 것임.
-    print("Wall_position : ", Crank_slider_system.get_links_pos(link_idx["Wall_1"][0]), Crank_slider_system.get_links_pos(link_idx["Wall_1"][1]) )
-    print("Tablet_position : ", tablet.get_links_pos(tablet_link_idx["Tablet"][0]), tablet.get_links_pos(tablet_link_idx["Tablet"][1]))
-    
+    print("------------------- Scene Built ------------------")
+    print("Scene Enttities : ", scene.entities)    
 
-    # Equality constraint
-    link1 = tablet.get_link(tablet_link_name[0])
-    link2 = tablet.get_link(tablet_link_name[1])
-    link1_idx_arr = np.array(link1.idx, dtype=gs.np_int)
-    link2_idx_arr = np.array(link2.idx, dtype=gs.np_int)
-    solver.add_weld_constraint(link1_idx_arr, link2_idx_arr)
+    # # Equality constraint
+    # link1 = tablet.get_link(tablet_link_name[0])
+    # link2 = tablet.get_link(tablet_link_name[1])
+    # link1_idx_arr = np.array(link1.idx, dtype=gs.np_int)
+    # link2_idx_arr = np.array(link2.idx, dtype=gs.np_int)
+    # solver.add_weld_constraint(link1_idx_arr, link2_idx_arr)
 
     # Wall position global : (-0.4435, 0.1300, 0.0500), local tablet_pos = (-0.3, 0.0, 0.0)
     # Wall position == Tablet position
     # tablet position = 0.353 0.01 -0.22 -> 90 0 90 euler
-    
+
     tablet_pos = Crank_slider_system.get_links_pos(link_idx["Wall_1"][0])
     tablet_pos = tablet_pos.tolist()
+    tablet_pos[0][2] += 0.05  # Wall 의 두께 고려
     print(tablet_pos)
     tablet.set_pos(pos = tablet_pos[0])
 
-    cam.start_recording()
+    # 특정 link 의 좌표를 가져올 수 있는 게 아닌, 전체 Entity 의 좌표를 가져오는 것임.
+    print("Wall_position : ", Crank_slider_system.get_links_pos())
+    print("Tablet_position : ", tablet.get_links_pos(), tablet.get_pos())
+    # cam.start_recording()
 
     try:
+        # second: 10, timestep = 0.01
         steps = int(args.seconds / args.timestep) if "PYTEST_VERSION" not in os.environ else 10
+        print("steps : ", steps)
         for _ in range(steps):
-            print(sensor.read())
-            cam.render()
+            # 일부 노이즈 발생. 
+            # print(sensor.read())
+            # cam.render()
             scene.step()
     except KeyboardInterrupt:
         gs.logger.info("Simulation interrupted, exiting.")
     finally:
         gs.logger.info("Simulation finished.")
         # cam.stop_recording(save_to_filename ="video/SensorTEST_V2_20251010.mp4")
-        scene.stop_recording()
-
+        # scene.stop_recording()
 
 if __name__ == "__main__":
     main()
 
+
 # Wall 의 시뮬레이션 상 좌표 : 0.353 0.01 -0.22 .. ?
+# Wall_position :  tensor
+#       ([[ 0.0000,  0.0000,  0.0000],
+#         [-0.1630,  0.1100,  0.0500],
+#         [-0.1485,  0.2555,  0.0500],
+#         [ 0.0000,  0.0000,  0.0000],
+#         [-0.1435,  0.1300,  0.0500],
+#         [-0.1435,  0.2240,  0.0500]], device='cuda:0')
+# Tablet_position :  tensor
+#        ([[0., 0., 0.],
+#         [0., 0., 0.]], device='cuda:0')
+#
+#  [[-0.14350000023841858, 0.12999999523162842, 0.05000000074505806]]
