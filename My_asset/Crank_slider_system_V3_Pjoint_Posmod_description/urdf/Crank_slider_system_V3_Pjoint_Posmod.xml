@@ -45,7 +45,8 @@
         </body>
       </body>
     </body>
-    <body name="Shaft_1" pos="-0.0485 0.2365 0.05">
+    <!-- Shaft y 수정-->
+    <body name="Shaft_1" pos="-0.0485 0.2265 0.05">
       <inertial pos="-0.0872505 0.00603152 0" quat="0.435342 0.435342 0.557205 0.557205" mass="0.200519" diaginertia="0.000126812 9.4474e-05 5.06617e-05"/>
       <joint name="Slider 61" pos="0 0 0" axis="0 1 0" type="slide" actuatorfrcrange="-100 100"/>
       <geom pos="0.0485 -0.226 -0.05" quat="1 0 0 0" type="mesh" rgba="0.7 0.7 0.7 1" mesh="Shaft_1"/>
@@ -58,8 +59,31 @@
     <!-- <position name="position_servo" joint="Revolute 47" ctrlrange="-100 100" ctrllimited="true" kp="100"/>
      <velocity name="velocity_servo" joint="Revolute 47" kv="10"/> -->
   </actuator>
-  
+
+  <!-- 
+    solimp (임피던스)
+      **"얼마나 세게 붙일까?"**를 결정합니다.​
+
+      레고 블록을 생각해보세요:
+
+      0.99에 가까운 값: 레고를 딱! 세게 꽂은 것처럼 매우 단단하게 붙습니다​
+
+      0.5 같은 작은 값: 찰흙으로 살짝 붙인 것처럼 느슨하게 붙습니다​
+
+      solimp="0.9999 0.9999 0.001"처럼 앞 두 숫자를 1에 가깝게 하면 제약이 매우 강해집니다.​
+
+    solref (참조)
+      **"얼마나 빨리, 얼마나 탄력적으로 반응할까?"**를 결정합니다.​
+
+      고무줄을 생각해보세요:
+
+      첫 번째 숫자(시간 상수): 고무줄이 얼마나 빨리 잡아당기는지입니다. 숫자가 작을수록 빨리 반응합니다 (더 강한 용수철)​
+
+      두 번째 숫자(댐핑 비율): 고무줄이 통통 튀는지, 조용히 멈추는지입니다. 보통 1로 설정하면 적당히 멈춥니다​
+
+      solref="0.001 1"처럼 설정하면 빠르고 안정적으로 반응합니다.​ -->
+      
   <equality>
-    <weld body1="Link3_1" body2 = "Shaft_1" anchor = "100 0 0" solref = "0.001 1" solimp = "0.99 0.999 0.001"/>
+    <weld body1="Shaft_1" body2 = "Link3_1" anchor = "0 0 0" solref = "0.001 1" solimp = "0.9999 0.9999 0.001"/>
   </equality>
 </mujoco>

@@ -5,6 +5,7 @@ from tqdm import tqdm
 
 import roma
 import torch
+import math as m
 
 # 오일러 각을 회전 행렬로 변환
 euler_angles = [90, 0, 90]  # degrees
@@ -62,8 +63,8 @@ def main():
     )
     cam = scene.add_camera(
         res=(1280, 960),
-        pos = (3,0,3),
-        lookat=(0, 0, 0.0),
+        pos = (10,2,5),
+        lookat=(0, 2, 0.0),
         fov=30,
         
         GUI=True,
@@ -117,9 +118,9 @@ def main():
         gs.morphs.MJCF(
             file = "My_asset/Tablet_posmod/Tablet_posmod.xml",
             # Crank_slider_system, Wall position = 0.353 0.01 -0.22
-            # euler = (90,0,90),
-            pos = (-0.48, 3.36, 5),
-            scale = 10.0,
+            euler = (90,0,0),
+            pos = (-0.6, 3.38, 5),
+            scale = 20.0,
         )
     )
 
@@ -191,10 +192,53 @@ def main():
     print("Tablet_position : ", tablet.get_links_pos(), tablet.get_pos())
     cam.start_recording()
 
+    ############################### hard reset ##########################
+    ######################## control dofs ########################
+    Crank_slider_system.set_dofs_kp(
+    kp = np.array([0.1,.1,.1,.1]),
+    dofs_idx_local = dofs_idx,
+    )
+    Crank_slider_system.set_dofs_kv(
+        kv = np.array([0.1,0.1,0.1,0.1]),
+        dofs_idx_local = dofs_idx,
+    )
+
+    # set_dof_position 
+    desired_position = m.pi / 3
+    desired_position_list = [desired_position if i == 0 else 0.0 for i in range(len(dofs_idx))]
+    Crank_slider_system.control_dofs_position(desired_position_list, dofs_idx)
+    
+    # tablet.set_pos(pos = tablet_pos[0])
+
+    for _ in range(200):
+        cam.render()
+        scene.step()
+
+    # tablet.set_pos(pos = tablet_pos[0])
+
+    initial_pos = tablet.get_pos().tolist()
+    initial_pos[-1] -= 4.5
+    tablet.set_pos(initial_pos)
+
+    for _ in range(10):
+        cam.render()
+        scene.step()
+
+
+    
+    # def control_dofs_velocity(self, velocity:, dofs_idx_local=None, envs_idx=None, *, unsafe=False):
+    target_velocity = 1.0 # angular velocity rad/s ..? 
+    target_velocity_list = [target_velocity if i == 0 else 0.0 for i in range(len(dofs_idx))]
+    Crank_slider_system.control_dofs_force(target_velocity_list, dofs_idx)
+    # Crank_slider_system.set_dofs_position(target_velocity_list, dofs_idx)
+
+    ########################## sim loop ##########################
     try:
         # second: 10, timestep = 0.01
         steps = int(args.seconds / args.timestep) if "PYTEST_VERSION" not in os.environ else 10
         print("steps : ", steps)
+        cam.set_pose(pos = (5, 3.5, 2.5), lookat = (0, 3.5, 0))
+
         for _ in tqdm(range(steps)):
             # 일부 노이즈 발생. 
             # print(sensor.read())
@@ -204,7 +248,7 @@ def main():
         gs.logger.info("Simulation interrupted, exiting.")
     finally:
         gs.logger.info("Simulation finished.")
-        cam.stop_recording(save_to_filename ="video/SystemIntegration_Debug2_posmod_20251014.mp4")
+        cam.stop_recording(save_to_filename ="video/SystemIntegration_Debug1_imphard_20251014.mp4")
         scene.stop_recording()
 
 if __name__ == "__main__":
@@ -235,9 +279,10 @@ if __name__ == "__main__":
 
 # 2025.10.15 해야할것. 
 # pyLife 알아보기 -> SN 선도 근사할 아이디어 생각해보기
+# tensile strength 식을 convex surface 의 알약에서 근사할 수 있을 듯 함. 
+# 이를 통해 구현할 수 있는 부분은 결과적으로 원하는 값은 S-N curve. S-N curve 를 근사할 수 있는 방법 중 tablet braking force 와 tablet tensile strength 를 이용할 수 있음.  
 # 위치는 대충 조정 된듯함. motor_shaft_1 의 각도 조정 dof_idx_position ,..? 이런 함수. 
 
-# Tablet posmod freejoint 제거하고, Wall 위치에 맞게 pos 조정하기. -> 완료
-# Tablet link 2개에 센서 부착 -> 완료
-# Tablet link 2개에 대한 좌표 출력 -> 완료
-# Tablet link 2개에 대한 센서 출력 -> 완료
+# 2025.10.15 수정사항
+# weld 가 풀려버리는 현상이 계속 발생, 공차와 anchor 수정을 통해 해결함.
+# anchor = "0 0 0" solref = "0.001 1" solimp = "0.99 0.999 0.001"

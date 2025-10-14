@@ -17,7 +17,7 @@
     <mesh name="Slider1_1" content_type="model/stl" file="Slider1_1.stl" scale="0.001 0.001 0.001"/>
     
     <!-- hole 개선-->
-    <mesh name="Link3_1_collision_(1)" file="/home/seongjin/Desktop/Seongjin/genesis_simulation_on_linux/My_asset/Crank_slider_system_V3_Pjoint_description/urdf/Link3_1_collision_(1).obj" scale="0.001 0.001 0.001"/>
+    <mesh name="Link3_1_collision_(1)" file="Link3_1_collision_(1).obj" scale="0.001 0.001 0.001"/>
     <!-- <mesh name="Link3_1_collision_(10)" file="/home/seongjin/Desktop/Seongjin/genesis_simulation_on_linux/My_asset/Crank_slider_system_V3_Pjoint_description/urdf/Link3_1_collision_(10).obj" scale="0.001 0.001 0.001"/>
     <mesh name="Link3_1_collision_(11)" file="/home/seongjin/Desktop/Seongjin/genesis_simulation_on_linux/My_asset/Crank_slider_system_V3_Pjoint_description/urdf/Link3_1_collision_(11).obj" scale="0.001 0.001 0.001"/>
     <mesh name="Link3_1_collision_(12)" file="/home/seongjin/Desktop/Seongjin/genesis_simulation_on_linux/My_asset/Crank_slider_system_V3_Pjoint_description/urdf/Link3_1_collision_(12).obj" scale="0.001 0.001 0.001"/>
@@ -110,7 +110,8 @@
   <actuator>
     <motor joint="Revolute 47" ctrlrange="-3 3" ctrllimited="true" forcerange = "-3 3" gear = "10"/>
   </actuator>
-  <!-- <equality>
-    <weld body1="Link3_1" body2 = "Shaft_1" anchor = "0 0 0"/>
-  </equality> -->
+  <equality>
+    <connect body1="Link3_1" body2 = "Shaft_1" anchor = "0 0 0"/>
+    <connect body1="Link3_1" body2 = "Shaft_1" anchor = "0 0 0"/>
+  </equality>
 </mujoco>
