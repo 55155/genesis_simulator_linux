@@ -7,6 +7,7 @@ import roma
 import torch
 import math as m
 
+
 # 오일러 각을 회전 행렬로 변환
 euler_angles = [90, 0, 90]  # degrees
 R = roma.euler_to_rotmat('XYZ', euler_angles, degrees=True)
@@ -204,15 +205,15 @@ def main():
     )
 
     # set_dof_position 
-    desired_position = m.pi / 3
+    desired_position = m.pi / 2 
     desired_position_list = [desired_position if i == 0 else 0.0 for i in range(len(dofs_idx))]
-    Crank_slider_system.control_dofs_position(desired_position_list, dofs_idx)
+    # Crank_slider_system.set_dofs_position(desired_position_list, dofs_idx)
     
     # tablet.set_pos(pos = tablet_pos[0])
 
-    for _ in range(200):
-        cam.render()
-        scene.step()
+    # for _ in range(200):
+    #     cam.render()
+    #     scene.step()
 
     # tablet.set_pos(pos = tablet_pos[0])
 
@@ -220,35 +221,52 @@ def main():
     initial_pos[-1] -= 4.5
     tablet.set_pos(initial_pos)
 
-    for _ in range(10):
-        cam.render()
-        scene.step()
+    # for _ in range(10):
+    #     cam.render()
+    #     scene.step()
 
-
-    
     # def control_dofs_velocity(self, velocity:, dofs_idx_local=None, envs_idx=None, *, unsafe=False):
-    target_velocity = 1.0 # angular velocity rad/s ..? 
+    target_velocity = 10000.0 # angular velocity rad/s ..? 
     target_velocity_list = [target_velocity if i == 0 else 0.0 for i in range(len(dofs_idx))]
     Crank_slider_system.control_dofs_force(target_velocity_list, dofs_idx)
     # Crank_slider_system.set_dofs_position(target_velocity_list, dofs_idx)
 
     ########################## sim loop ##########################
+    from Crank_slider import CrankSlider
+    # 1 : motor fixed
+    # 2 : crank fixed
+    # 3 : rod fixed
+    # 4 : slider fixed
+    Crankslider = CrankSlider(Crank_length=2.0, rod_length=8.0, offset=0.0)
     try:
-        # second: 10, timestep = 0.01
+        # second: 2.0, timestep = 0.01
         steps = int(args.seconds / args.timestep) if "PYTEST_VERSION" not in os.environ else 10
         print("steps : ", steps)
-        cam.set_pose(pos = (5, 3.5, 2.5), lookat = (0, 3.5, 0))
+        # cam.set_pose(pos = (5, 3.5, 2.5), lookat = (0, 3.5, 0))
 
-        for _ in tqdm(range(steps)):
+        for _ in range(steps):
+            Crankslider.calculate_positions()
+            temp = Crankslider.get_inversion_angles_at_time(1, _/10, in_degrees=False)
+            R1 = temp['crank_angle']
+            temp = Crankslider.get_inversion_angles_at_time(2, _/10, in_degrees=False)
+            R2 = temp['rod_angle']
+            temp = Crankslider.get_inversion_angles_at_time(4, _/10, in_degrees=False)
+            R3 = temp["rod_angle"]
+            P1 = temp['slider_position']
+            
+
+            desired_position = [R1, R2, R3, P1]
+            Crank_slider_system.set_dofs_position(desired_position, dofs_idx)
             # 일부 노이즈 발생. 
             # print(sensor.read())
             cam.render()
             scene.step()
+
     except KeyboardInterrupt:
         gs.logger.info("Simulation interrupted, exiting.")
     finally:
         gs.logger.info("Simulation finished.")
-        cam.stop_recording(save_to_filename ="video/SystemIntegration_Debug1_imphard_20251014.mp4")
+        cam.stop_recording(save_to_filename ="video/SystemIntegration_20251017(2).mp4")
         scene.stop_recording()
 
 if __name__ == "__main__":
@@ -286,3 +304,7 @@ if __name__ == "__main__":
 # 2025.10.15 수정사항
 # weld 가 풀려버리는 현상이 계속 발생, 공차와 anchor 수정을 통해 해결함.
 # anchor = "0 0 0" solref = "0.001 1" solimp = "0.99 0.999 0.001"
+
+# 2025.10.16 수정사항
+# weld 불안정성 높음, 따라서 dofs position constrol 로 어느정도 해결해야할듯
+# Cranks-slider mechanism passive dofs position 계산 -> CrankSliderMechanism class 생성  
