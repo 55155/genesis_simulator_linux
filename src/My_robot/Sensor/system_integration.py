@@ -45,6 +45,7 @@ def main():
     ########################## scene setup ##########################
     scene = gs.Scene(
         sim_options=gs.options.SimOptions(
+            gravity=(0.0, 0.0, -9.81),
             dt=args.timestep,
         ),
         rigid_options=gs.options.RigidOptions(
@@ -196,11 +197,11 @@ def main():
     ############################### hard reset ##########################
     ######################## control dofs ########################
     Crank_slider_system.set_dofs_kp(
-    kp = np.array([0.1,.1,.1,.1]),
+    kp = np.array([1,1,1,1]),
     dofs_idx_local = dofs_idx,
     )
     Crank_slider_system.set_dofs_kv(
-        kv = np.array([0.1,0.1,0.1,0.1]),
+        kv = np.array([1,1,1,1]),
         dofs_idx_local = dofs_idx,
     )
 
@@ -219,18 +220,20 @@ def main():
 
     initial_pos = tablet.get_pos().tolist()
     initial_pos[-1] -= 4.5
-    tablet.set_pos(initial_pos)
+    # tablet.set_pos(initial_pos)
 
     # for _ in range(10):
     #     cam.render()
     #     scene.step()
 
     # def control_dofs_velocity(self, velocity:, dofs_idx_local=None, envs_idx=None, *, unsafe=False):
-    target_velocity = 10000.0 # angular velocity rad/s ..? 
-    target_velocity_list = [target_velocity if i == 0 else 0.0 for i in range(len(dofs_idx))]
-    Crank_slider_system.control_dofs_force(target_velocity_list, dofs_idx)
+    target_velocity = m.pi / 2 # angular velocity rad/s ..? 
+    target_velocity_list = [target_velocity if i == 0 else 1.0 for i in range(len(dofs_idx))]
+    # Crank_slider_system.set_dofs_velocity(target_velocity_list, dofs_idx)
     # Crank_slider_system.set_dofs_position(target_velocity_list, dofs_idx)
 
+    target_force = -10000 # N * m
+    target_force_list = np.array([target_force, 0,0,0])
     ########################## sim loop ##########################
     from Crank_slider import CrankSlider
     # 1 : motor fixed
@@ -246,17 +249,18 @@ def main():
 
         for _ in range(steps):
             Crankslider.calculate_positions()
-            temp = Crankslider.get_inversion_angles_at_time(1, _/10, in_degrees=False)
+            temp = Crankslider.get_inversion_angles_at_time(1, _, in_degrees=False)
             R1 = temp['crank_angle']
-            temp = Crankslider.get_inversion_angles_at_time(2, _/10, in_degrees=False)
+            temp = Crankslider.get_inversion_angles_at_time(1, _, in_degrees=False)
             R2 = temp['rod_angle']
-            temp = Crankslider.get_inversion_angles_at_time(4, _/10, in_degrees=False)
+            temp = Crankslider.get_inversion_angles_at_time(1, _, in_degrees=False)
             R3 = temp["rod_angle"]
             P1 = temp['slider_position']
             
 
-            desired_position = [R1, R2, R3, P1]
-            Crank_slider_system.set_dofs_position(desired_position, dofs_idx)
+            desired_position = [R1, 0, 0, 0]
+            # Crank_slider_system.set_dofs_position(desired_position, dofs_idx)
+            Crank_slider_system.control_dofs_velocity(target_force_list, dofs_idx)
             # 일부 노이즈 발생. 
             # print(sensor.read())
             cam.render()
@@ -266,7 +270,7 @@ def main():
         gs.logger.info("Simulation interrupted, exiting.")
     finally:
         gs.logger.info("Simulation finished.")
-        cam.stop_recording(save_to_filename ="video/SystemIntegration_20251017(2).mp4")
+        cam.stop_recording(save_to_filename ="video/SystemIntegration_20251020(1).mp4")
         scene.stop_recording()
 
 if __name__ == "__main__":

@@ -1,8 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
-from numpy import pi, sin, cos, sqrt, arctan2
-from typing import Tuple, Optional
+from numpy import pi, sin, cos, sqrt, arctan2, arccos
+from typing import Tuple, Optional, Literal
 
 
 class FourBarLinkage:
@@ -168,6 +168,295 @@ class FourBarLinkage:
             self.y_C[i] = self.y_B[i] + self.r3 * sin(theta3)
         
         print(f"✓ Calculation complete! (Total {n_points} frames)")
+    
+    def kinematic_inversion(
+        self,
+        fixed_joint_1: Literal['A', 'B', 'C', 'D'],
+        fixed_joint_2: Literal['A', 'B', 'C', 'D'],
+        interval: int = 30,
+        figsize: Tuple[int, int] = (14, 6)
+    ) -> None:
+        """
+        Perform kinematic inversion by fixing different links as ground
+        
+        Parameters
+        ----------
+        fixed_joint_1 : str
+            First fixed joint ('A', 'B', 'C', 'D')
+        fixed_joint_2 : str
+            Second fixed joint ('A', 'B', 'C', 'D')
+        interval : int
+            Animation interval in milliseconds
+        figsize : tuple
+            Figure size
+            
+        Examples
+        --------
+        Original configuration (A-D fixed):
+            linkage.kinematic_inversion('A', 'D')
+        
+        First inversion (A-B fixed - Link 2 as ground):
+            linkage.kinematic_inversion('A', 'B')
+        
+        Second inversion (B-C fixed - Link 3 as ground):
+            linkage.kinematic_inversion('B', 'C')
+        
+        Third inversion (C-D fixed - Link 4 as ground):
+            linkage.kinematic_inversion('C', 'D')
+        """
+        if self.theta2_array is None:
+            raise ValueError("Please run calculate_positions() first!")
+        
+        # Validate inputs
+        valid_joints = ['A', 'B', 'C', 'D']
+        if fixed_joint_1 not in valid_joints or fixed_joint_2 not in valid_joints:
+            raise ValueError(f"Joints must be one of {valid_joints}")
+        
+        if fixed_joint_1 == fixed_joint_2:
+            raise ValueError("Two different joints must be specified")
+        
+        # Determine inversion type
+        fixed_pair = ''.join(sorted([fixed_joint_1, fixed_joint_2]))
+        inversion_map = {
+            'AD': ('Link 1 (Ground)', 'Original Configuration', self.r1),
+            'AB': ('Link 2 (Crank)', 'First Inversion', self.r2),
+            'BC': ('Link 3 (Coupler)', 'Second Inversion', self.r3),
+            'CD': ('Link 4 (Rocker)', 'Third Inversion', self.r4)
+        }
+        
+        if fixed_pair not in inversion_map:
+            raise ValueError(f"Invalid joint pair. Valid pairs: AD, AB, BC, CD")
+        
+        link_name, inversion_name, fixed_length = inversion_map[fixed_pair]
+        
+        print(f"\n{'='*60}")
+        print(f"Kinematic Inversion: {inversion_name}")
+        print(f"Fixed Link: {fixed_joint_1}-{fixed_joint_2} ({link_name})")
+        print(f"Fixed Link Length: {fixed_length:.3f}")
+        print(f"{'='*60}\n")
+        
+        # Get transformed coordinates
+        x_A_tf, y_A_tf, x_B_tf, y_B_tf, x_C_tf, y_C_tf, x_D_tf, y_D_tf = \
+            self._transform_to_inversion(fixed_joint_1, fixed_joint_2)
+        
+        # Create figure
+        self.fig, (self.ax1, self.ax2) = plt.subplots(1, 2, figsize=figsize)
+        
+        # Setup plots with transformed coordinates
+        self._setup_inversion_mechanism_plot(
+            x_A_tf, y_A_tf, x_D_tf, y_D_tf,
+            fixed_joint_1, fixed_joint_2, inversion_name
+        )
+        self._setup_angle_plot()
+        
+        # Store transformed data
+        self._inv_data = {
+            'x_A': x_A_tf, 'y_A': y_A_tf,
+            'x_B': x_B_tf, 'y_B': y_B_tf,
+            'x_C': x_C_tf, 'y_C': y_C_tf,
+            'x_D': x_D_tf, 'y_D': y_D_tf,
+            'fixed_1': fixed_joint_1,
+            'fixed_2': fixed_joint_2
+        }
+        
+        # Initialize trajectory
+        self.traj_x = []
+        self.traj_y = []
+        
+        # Create animation
+        print("Creating inversion animation...")
+        self.animation = animation.FuncAnimation(
+            self.fig,
+            self._animate_inversion_frame,
+            init_func=self._init_animation,
+            frames=len(self.theta2_array),
+            interval=interval,
+            blit=True,
+            repeat=True
+        )
+        
+        plt.tight_layout()
+        plt.show()
+    
+    def _transform_to_inversion(
+        self,
+        fixed_joint_1: str,
+        fixed_joint_2: str
+    ) -> Tuple[np.ndarray, ...]:
+        """
+        Transform coordinates for kinematic inversion
+        
+        Returns
+        -------
+        x_A, y_A, x_B, y_B, x_C, y_C, x_D, y_D : arrays
+            Transformed coordinates for all joints
+        """
+        n_points = len(self.theta2_array)
+        
+        # Get original joint coordinates for each frame
+        # These are already calculated
+        x_A_orig = np.full(n_points, self.x_A)
+        y_A_orig = np.full(n_points, self.y_A)
+        x_B_orig = self.x_B
+        y_B_orig = self.y_B
+        x_C_orig = self.x_C
+        y_C_orig = self.y_C
+        x_D_orig = np.full(n_points, self.x_D)
+        y_D_orig = np.full(n_points, self.y_D)
+        
+        # Create a mapping
+        joint_coords = {
+            'A': (x_A_orig, y_A_orig),
+            'B': (x_B_orig, y_B_orig),
+            'C': (x_C_orig, y_C_orig),
+            'D': (x_D_orig, y_D_orig)
+        }
+        
+        # Get coordinates of the two fixed joints
+        x1, y1 = joint_coords[fixed_joint_1]
+        x2, y2 = joint_coords[fixed_joint_2]
+        
+        # Transform: place first joint at origin, second on positive x-axis
+        x_A_tf = np.zeros(n_points)
+        y_A_tf = np.zeros(n_points)
+        x_B_tf = np.zeros(n_points)
+        y_B_tf = np.zeros(n_points)
+        x_C_tf = np.zeros(n_points)
+        y_C_tf = np.zeros(n_points)
+        x_D_tf = np.zeros(n_points)
+        y_D_tf = np.zeros(n_points)
+        
+        for i in range(n_points):
+            # Translation: move first fixed joint to origin
+            dx = x1[i]
+            dy = y1[i]
+            
+            # Rotation: align second fixed joint to x-axis
+            angle = arctan2(y2[i] - y1[i], x2[i] - x1[i])
+            
+            # Apply transformation to all joints
+            for joint_name in ['A', 'B', 'C', 'D']:
+                x_orig, y_orig = joint_coords[joint_name]
+                
+                # Translate
+                x_t = x_orig[i] - dx
+                y_t = y_orig[i] - dy
+                
+                # Rotate
+                x_r = x_t * cos(-angle) - y_t * sin(-angle)
+                y_r = x_t * sin(-angle) + y_t * cos(-angle)
+                
+                # Store
+                if joint_name == 'A':
+                    x_A_tf[i], y_A_tf[i] = x_r, y_r
+                elif joint_name == 'B':
+                    x_B_tf[i], y_B_tf[i] = x_r, y_r
+                elif joint_name == 'C':
+                    x_C_tf[i], y_C_tf[i] = x_r, y_r
+                elif joint_name == 'D':
+                    x_D_tf[i], y_D_tf[i] = x_r, y_r
+        
+        return x_A_tf, y_A_tf, x_B_tf, y_B_tf, x_C_tf, y_C_tf, x_D_tf, y_D_tf
+    
+    def _setup_inversion_mechanism_plot(
+        self,
+        x_fixed_1: np.ndarray,
+        y_fixed_1: np.ndarray,
+        x_fixed_2: np.ndarray,
+        y_fixed_2: np.ndarray,
+        joint_1_name: str,
+        joint_2_name: str,
+        inversion_name: str
+    ) -> None:
+        """Setup mechanism plot for inversion"""
+        self.ax1.set_aspect('equal')
+        self.ax1.grid(True, alpha=0.3)
+        
+        # Auto axis range
+        max_reach = max(self.r1, self.r2, self.r3, self.r4) * 2 + 1
+        self.ax1.set_xlim(-max_reach, max_reach)
+        self.ax1.set_ylim(-max_reach, max_reach)
+        
+        self.ax1.set_xlabel('X [m]', fontsize=12)
+        self.ax1.set_ylabel('Y [m]', fontsize=12)
+        self.ax1.set_title(f'Four-Bar Linkage - {inversion_name}', 
+                          fontsize=14, fontweight='bold')
+        
+        # Initialize link line
+        self.line, = self.ax1.plot(
+            [], [], 'o-', lw=4, color='#2b8cbe',
+            markersize=8, markerfacecolor='red'
+        )
+        
+        # Initialize trajectory line
+        self.trajectory, = self.ax1.plot(
+            [], [], '-', lw=2, color='orange', alpha=0.8
+        )
+        
+        # Show fixed joints
+        self.ax1.plot(x_fixed_1[0], y_fixed_1[0], 'ko', markersize=12, zorder=5)
+        self.ax1.plot(x_fixed_2[0], y_fixed_2[0], 'ko', markersize=12, zorder=5)
+        self.ax1.text(
+            x_fixed_1[0]-0.3, y_fixed_1[0]-0.5, joint_1_name,
+            fontsize=12, fontweight='bold'
+        )
+        self.ax1.text(
+            x_fixed_2[0]+0.2, y_fixed_2[0]-0.5, joint_2_name,
+            fontsize=12, fontweight='bold'
+        )
+        
+        # Add fixed link indicator
+        fixed_link_length = sqrt((x_fixed_2[0] - x_fixed_1[0])**2 + 
+                                (y_fixed_2[0] - y_fixed_1[0])**2)
+        self.ax1.plot([x_fixed_1[0], x_fixed_2[0]], 
+                     [y_fixed_1[0], y_fixed_2[0]], 
+                     'k-', lw=6, alpha=0.3, zorder=1,
+                     label=f'Fixed Link ({joint_1_name}-{joint_2_name})')
+        self.ax1.legend(fontsize=10, loc='upper right')
+    
+    def _animate_inversion_frame(self, frame: int):
+        """Update animation frame for inversion"""
+        inv = self._inv_data
+        
+        # Draw linkage in correct order
+        x_points = [inv['x_A'][frame], inv['x_B'][frame], 
+                   inv['x_C'][frame], inv['x_D'][frame]]
+        y_points = [inv['y_A'][frame], inv['y_B'][frame], 
+                   inv['y_C'][frame], inv['y_D'][frame]]
+        
+        self.line.set_data(x_points, y_points)
+        
+        # Trace moving joint (not one of the fixed joints)
+        moving_joints = set(['A', 'B', 'C', 'D']) - set([inv['fixed_1'], inv['fixed_2']])
+        moving_joint = list(moving_joints)[0]  # Pick first moving joint
+        
+        if moving_joint == 'A':
+            traj_x, traj_y = inv['x_A'][frame], inv['y_A'][frame]
+        elif moving_joint == 'B':
+            traj_x, traj_y = inv['x_B'][frame], inv['y_B'][frame]
+        elif moving_joint == 'C':
+            traj_x, traj_y = inv['x_C'][frame], inv['y_C'][frame]
+        else:  # 'D'
+            traj_x, traj_y = inv['x_D'][frame], inv['y_D'][frame]
+        
+        self.traj_x.append(traj_x)
+        self.traj_y.append(traj_y)
+        
+        # Limit trajectory length
+        points_per_cycle = int(2 * pi / (self.theta2_array[1] - self.theta2_array[0]))
+        if len(self.traj_x) > points_per_cycle * 1.5:
+            self.traj_x = self.traj_x[-int(points_per_cycle * 1.5):]
+            self.traj_y = self.traj_y[-int(points_per_cycle * 1.5):]
+        
+        self.trajectory.set_data(self.traj_x, self.traj_y)
+        
+        # Update angle graph
+        self.current_point.set_data(
+            [np.degrees(self.theta2_array[frame])],
+            [np.degrees(self.theta3_array[frame])]
+        )
+        
+        return self.line, self.trajectory, self.current_point
     
     def get_coupler_point(
         self, 
@@ -508,17 +797,21 @@ if __name__ == "__main__":
         r4=3.0   # Rocker
     )
     
-    # Calculate positions (one cycle only)
+    # Calculate positions (one cycle)
     linkage.calculate_positions(rot_num=1, increment=0.05)
     
-    # Run animation (show full trajectory in advance)
+    # Original configuration (A-D fixed)
+    print("\n=== Original Configuration ===")
     linkage.animate(interval=30, trace_point='coupler_mid', show_full_trajectory=True)
     
-    # Plot trajectory for one cycle
-    linkage.plot_trajectory(point_ratio=0.5, offset=0.0, num_cycles=1)
+    # First Inversion: Fix A-B (Link 2 as ground)
+    print("\n=== First Inversion: A-B Fixed ===")
+    linkage.kinematic_inversion('A', 'B', interval=30)
     
-    # Compare various coupler point trajectories
-    # linkage.plot_trajectory(point_ratio=0.3, offset=0.5, num_cycles=1)
+    # Second Inversion: Fix B-C (Link 3 as ground)
+    print("\n=== Second Inversion: B-C Fixed ===")
+    linkage.kinematic_inversion('B', 'C', interval=30)
     
-    # Save animation (optional)
-    # linkage.save_animation('four_bar_linkage.gif', fps=30)
+    # Third Inversion: Fix C-D (Link 4 as ground)
+    print("\n=== Third Inversion: C-D Fixed ===")
+    linkage.kinematic_inversion('C', 'D', interval=30)

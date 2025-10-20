@@ -828,7 +828,7 @@ class CrankSlider:
 
 # 사용 예시
 if __name__ == "__main__":
-    mech = CrankSlider(Crank_length=4.0, rod_length=6.0, offset=0.0)
+    mech = CrankSlider(Crank_length=2.0, rod_length=6.0, offset=0.0)
     mech.calculate_positions(rot_num=2, increment=0.05)
     
     # 전체 각도 배열 반환 (예: inversion 2)
@@ -842,7 +842,7 @@ if __name__ == "__main__":
     angle_at_time = mech.get_inversion_angles_at_time(2, time_index, in_degrees=True)
     print(f"Time {angle_at_time['time']:.2f} deg, Crank angle: {angle_at_time['crank_angle']:.2f}, Rod angle: {angle_at_time['rod_angle']:.2f}")
    # Create mechanism
-    crank_slider = CrankSlider(Crank_length=4.0, rod_length=6.0, offset=0.0)
+    crank_slider = CrankSlider(Crank_length=2.0, rod_length=8.0, offset=0.0)
     crank_slider.calculate_positions(rot_num=2, increment=0.05)
     
     # Get original configuration angles
@@ -884,9 +884,5 @@ if __name__ == "__main__":
     # 1 : motor fixed
     # 2 : crank fixed
     # 3 : rod fixed
-    # 4 : slider fixed4
-    crank_slider.kinematic_inversion(1, interval=30)
-    print(crank_slider.get_inversion_angles_at_time(inversion_type = 1, time_index = 1)["slider_position"])
-    print(crank_slider.get_inversion_angles_at_time(inversion_type = 3, time_index = 10)["rod_angle"])
-    print(crank_slider.get_inversion_angles_at_time(inversion_type = 4, time_index = 10)["rod_angle"])
-    print(crank_slider.get_inversion_angles_at_time(inversion_type = 2, time_index = 10)["slider_position"])
+    # 4 : slider fixed
+    crank_slider.kinematic_inversion(2, interval=30)
