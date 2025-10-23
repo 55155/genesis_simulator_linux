@@ -37,18 +37,8 @@ plane = scene.add_entity(gs.morphs.Plane(
 ))
 solver = scene.sim.rigid_solver
 
-# Adding a drone entity to the scene
-# franka = scene.add_entity(
-#     gs.morphs.URDF(file = 'urdf/drones/racer.urdf'),
-# )
-# macos 
 fn = f'./My_asset/Crank_slider_system_V3_Pjoint_description/urdf/Crank_slider_system_V3_Pjoint_sensor_V2.xml'
 
-# linux
-# fn = '/home/seongjin/Desktop/Seongjin/genesis_simulation_on_linux/My_asset/Crank_slider_system_V3_Pjoint_description/urdf/Crank_slider_system_V3_Pjoint_sensor.xml'
-
-# Adding a Crank_slider_system entity to the scene
-    # Crank-slider system
 Crank_slider_system = scene.add_entity(
         gs.morphs.MJCF(
             file = "My_asset/Crank_slider_system_V3_Pjoint_Posmod_description/urdf/" \
@@ -99,10 +89,6 @@ jnt_names = [
 dofs_idx = [Crank_slider_system.get_joint(name).dof_idx_local for name in jnt_names]
 
 print(dofs_idx)
-# solver.add_weld_constraint(np.array(link_idx["Shaft_1"][0], dtype=gs.np_int), np.array(link_idx["Link3_1"][0], dtype=gs.np_int))
-
-# for parallelization
-# pos_command = np.array([1000,0,0,0])
 
 # parameters
 r = 0.02 # crank radius
@@ -115,7 +101,7 @@ vel_command = np.array([crank_velocity,0,0])
 # force command
 crank_torque = 10.0  # N·m
 epsilon = 1e-6
-force_command = np.array([crank_torque,epsilon,epsilon])
+force_command = np.array([crank_torque,0,0])
 
 cam.start_recording()
 normal = cam.render()
@@ -130,20 +116,13 @@ Crank_slider_system.set_dofs_kv(
     dofs_idx_local = dofs_idx,
 )
 
-# Crank_slider_system.set_dofs_force_range(
-#     lower = (-0.0625, 0, 0,0.0),
-#     upper = (0.0625, 0, 0,0.0),
-# )
-Crank_slider_system.control_dofs_force(force_command, dofs_idx)
-# Crank_slider_system.control_dofs_velocity(vel_command, dofs_idx)
-
 # Crank_slider_system.control_dofs_position(pos_command, dofs_idx)
 print(Crank_slider_system.get_dofs_force())
 
 for i in range(iter):
     scene.step()
-    Crank_slider_system.control_dofs_force(force_command, dofs_idx)
-    Crank_slider_system.control_dofs_position([0,0,0], dofs_idx)
+    # Crank_slider_system.control_dofs_force(force_command, dofs_idx)
+    Crank_slider_system.control_dofs_position([i/20,i/20,0], dofs_idx)
 
     cam.set_pose(        
         pos = (10,2,5),
@@ -153,4 +132,4 @@ for i in range(iter):
     cam.render()
 
 
-cam.stop_recording(save_to_filename =  "./video/Error_20251020_4.mp4")
+cam.stop_recording(save_to_filename =  "./video/Error_20251023_4.mp4")

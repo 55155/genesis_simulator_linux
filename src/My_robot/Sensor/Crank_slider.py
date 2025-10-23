@@ -885,4 +885,4 @@ if __name__ == "__main__":
     # 2 : crank fixed
     # 3 : rod fixed
     # 4 : slider fixed
-    crank_slider.kinematic_inversion(2, interval=30)
+    crank_slider.kinematic_inversion(4, interval=30)
